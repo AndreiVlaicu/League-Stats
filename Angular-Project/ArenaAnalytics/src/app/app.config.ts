@@ -7,14 +7,21 @@ import { provideRouter } from '@angular/router';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 
-import { provideHttpClient, withFetch } from '@angular/common/http'; // ✅ ADD
+import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { routes } from './app.routes';
+import { RiotAuthInterceptor } from './core/interceptors/riot-auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(withFetch()), // ✅ ADD
+    provideHttpClient(withFetch(), withInterceptorsFromDi()),
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RiotAuthInterceptor,
+      multi: true,
+    },
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
   ],

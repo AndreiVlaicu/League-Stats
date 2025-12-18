@@ -1,0 +1,66 @@
+{
+    "/riot/riot": {
+        "target": "https://europe.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot": ""
+        }
+    },
+    "/riot/europe": {
+        "target": "https://europe.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/europe": ""
+        }
+    },
+    "/riot/americas": {
+        "target": "https://americas.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/americas": ""
+        }
+    },
+    "/riot/asia-pacific": {
+        "target": "https://asia-pacific.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/asia-pacific": ""
+        }
+    },
+    "/riot/euw1": {
+        "target": "https://euw1.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/euw1": ""
+        }
+    },
+    "/riot/eun1": {
+        "target": "https://eun1.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/eun1": ""
+        }
+    },
+    "/riot/na1": {
+        "target": "https://na1.api.riotgames.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/riot/na1": ""
+        }
+    },
+    "/champion-data": {
+        "target": "https://ddragon.leagueoflegends.com",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/champion-data": ""
+        }
+    }
+}
