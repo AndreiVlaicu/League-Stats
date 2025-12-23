@@ -34,7 +34,7 @@ const REGION_TO_ROUTING: Record<RegionUI, string> = {
       <p *ngIf="loading()">Loading...</p>
       <p *ngIf="error()">{{ error() }}</p>
 
-      <pre>{{ data() | json }}</pre>
+      <pre *ngIf="data() as d">{{ d | json }}</pre>
 
       <p *ngIf="data() && data().matchIds?.length === 0">
         Nu există meciuri pentru acest cont (sau e un cont nou). Încearcă alt Riot ID.
@@ -74,12 +74,17 @@ export class HomeComponent {
         )
       )
       .subscribe({
-        next: (res) => {
-          this.data.set(res);
+        next: (account) => {
+          this.data.set(account);
           this.loading.set(false);
         },
         error: (err) => {
-          this.error.set(`HTTP ${err?.status ?? ''} ${err?.statusText ?? ''}`);
+          const body =
+            typeof err?.error === 'string'
+              ? err.error.slice(0, 120)
+              : JSON.stringify(err?.error ?? {}).slice(0, 120);
+
+          this.error.set(`HTTP ${err?.status} | ${err?.message} | body: ${body}`);
           this.loading.set(false);
         },
       });

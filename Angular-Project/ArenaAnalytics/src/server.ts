@@ -89,10 +89,11 @@ app.use('/api/riot', async (req, res) => {
     const r = await fetch(url, { headers: { 'X-Riot-Token': RIOT_API_KEY } });
     const text = await r.text();
 
-    res
-      .status(r.status)
-      .type(r.headers.get('content-type') ?? 'application/json')
-      .send(text);
+    const ct = r.headers.get('content-type') || 'application/json; charset=utf-8';
+    res.status(r.status);
+    res.setHeader('content-type', ct);
+    res.send(text);
+    return;
   } catch (e: any) {
     res.status(500).json({ error: e?.message ?? 'Proxy error' });
   }
