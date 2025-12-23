@@ -43,7 +43,5 @@ __screenshots__/
 Thumbs.db
 
 # Environment files with API keys
-src/environments/environment.ts
-src/environments/environment.prod.ts
 .env
 .env.local
