@@ -19,37 +19,47 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING } from '../../core/regi
           <option>EUNE</option>
           <option>NA</option>
         </select>
-
+    
         <input [(ngModel)]="gameName" placeholder="gameName (ex: Caps)" />
         <input [(ngModel)]="tagLine" placeholder="tagLine (ex: G2)" />
-
+    
         <button (click)="search()">Caută</button>
         <button (click)="openSummoner()">Deschide Summoner</button>
       </div>
-
-      <p *ngIf="loading()">Loading...</p>
-      <p *ngIf="error()">{{ error() }}</p>
-
-      <pre *ngIf="data() as d">{{ d | json }}</pre>
-
-      <p *ngIf="data() && data().matchIds?.length === 0">
-        Nu există meciuri pentru acest cont (sau e un cont nou). Încearcă alt Riot ID.
-      </p>
-
-      <div *ngIf="data()?.matches?.length">
-        <h3>Match history (primele 5)</h3>
-
-        <div
-          *ngFor="let m of data().matches"
-          style="border:1px solid #ccc; padding:8px; margin:6px 0"
-        >
-          <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
-          <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
-          <div><b>Queue:</b> {{ m.info?.queueId }}</div>
+    
+      @if (loading()) {
+        <p>Loading...</p>
+      }
+      @if (error()) {
+        <p>{{ error() }}</p>
+      }
+    
+      @if (data(); as d) {
+        <pre>{{ d | json }}</pre>
+      }
+    
+      @if (data() && data().matchIds?.length === 0) {
+        <p>
+          Nu există meciuri pentru acest cont (sau e un cont nou). Încearcă alt Riot ID.
+        </p>
+      }
+    
+      @if (data()?.matches?.length) {
+        <div>
+          <h3>Match history (primele 5)</h3>
+          @for (m of data().matches; track m) {
+            <div
+              style="border:1px solid #ccc; padding:8px; margin:6px 0"
+              >
+              <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
+              <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
+              <div><b>Queue:</b> {{ m.info?.queueId }}</div>
+            </div>
+          }
         </div>
-      </div>
+      }
     </div>
-  `,
+    `,
 })
 export class HomeComponent {
   private riot = inject(RiotApiService);

@@ -27,136 +27,146 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
           <option>EUNE</option>
           <option>NA</option>
         </select>
-
+    
         <input [(ngModel)]="gameName" placeholder="gameName" />
         <input [(ngModel)]="tagLine" placeholder="tagLine" />
-
+    
         <button (click)="go()">Caută</button>
         <button (click)="back()">Înapoi</button>
         <button (click)="home()">Home</button>
       </div>
-
+    
       <h2>Summoner</h2>
-
-      <p *ngIf="loading()">Loading...</p>
-      <p *ngIf="error()">{{ error() }}</p>
-
-      <div *ngIf="bundle() as b">
-        <h3>{{ b.account.gameName }}#{{ b.account.tagLine }}</h3>
-
-        <p>
-          <b>Platform:</b> {{ b.platform }}
-          &nbsp;|&nbsp;
-          <b>Level:</b> {{ b.summoner.summonerLevel }}
-          &nbsp;|&nbsp;
-          <b>IconId:</b> {{ b.summoner.profileIconId }}
-          &nbsp;|&nbsp;
-          <b>DDragon:</b> {{ ddVersion() || '...' }}
-        </p>
-
-        <!-- Rank -->
-        <div *ngIf="b.rank?.length">
-          <h3>Ranked</h3>
-          <div *ngFor="let r of b.rank" style="border:1px solid #ddd; padding:8px; margin:6px 0">
-            <b>{{ r.queueType }}</b> — {{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)
-            <div>W/L: {{ r.wins }}/{{ r.losses }}</div>
-          </div>
-        </div>
-
-        <div *ngIf="b.matchIds?.length === 0">
-          Nu există meciuri pentru acest cont (sau e cont nou).
-        </div>
-
-        <!-- Match history -->
-        <div *ngIf="b.matches?.length">
-          <h3>Match history (primele {{ b.matches.length }})</h3>
-
-          <div
-            *ngFor="let m of b.matches"
-            style="border:1px solid #ccc; padding:10px; margin:8px 0"
-          >
-            <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap">
-              <div>
-                <b>{{ queueName(m.info?.queueId) }}</b>
-              </div>
-              <div>
-                <b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min
-              </div>
-            </div>
-
-            <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
-
-            <!-- Player summary -->
-            <div *ngIf="playerInMatch(m, b.account.puuid) as p" style="margin-top:10px">
-              <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
-                <!-- Champion icon -->
-                <img
-                  *ngIf="champIconUrl(p.championId) as cicon"
-                  [src]="cicon"
-                  width="52"
-                  height="52"
-                  style="border-radius:12px; border:1px solid #ddd"
-                />
-
-                <div style="flex:1; min-width:240px">
-                  <div style="font-weight:700">
-                    {{ champName(p.championId) || 'Champion #' + p.championId }}
-                    <span style="font-weight:400; opacity:.8"> — {{ p.win ? 'WIN' : 'LOSS' }}</span>
-                  </div>
-
-                  <div><b>KDA:</b> {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</div>
-
-                  <!-- Spells + Items row -->
-                  <div
-                    style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
-                  >
-                    <!-- Spells -->
-                    <img
-                      *ngIf="spellIconUrl(p.summoner1Id) as s1"
-                      [src]="s1"
-                      width="26"
-                      height="26"
-                      style="border-radius:6px; border:1px solid #ddd"
-                      title="Spell 1"
-                    />
-                    <img
-                      *ngIf="spellIconUrl(p.summoner2Id) as s2"
-                      [src]="s2"
-                      width="26"
-                      height="26"
-                      style="border-radius:6px; border:1px solid #ddd"
-                      title="Spell 2"
-                    />
-
-                    <!-- Items -->
-                    <ng-container *ngFor="let it of itemIds(p)">
-                      <img
-                        *ngIf="itemIconUrl(it) as iu"
-                        [src]="iu"
-                        width="26"
-                        height="26"
-                        style="border-radius:6px; border:1px solid #ddd"
-                        [title]="'Item ' + it"
-                      />
-                    </ng-container>
-                  </div>
+    
+      @if (loading()) {
+        <p>Loading...</p>
+      }
+      @if (error()) {
+        <p>{{ error() }}</p>
+      }
+    
+      @if (bundle(); as b) {
+        <div>
+          <h3>{{ b.account.gameName }}#{{ b.account.tagLine }}</h3>
+          <p>
+            <b>Platform:</b> {{ b.platform }}
+            &nbsp;|&nbsp;
+            <b>Level:</b> {{ b.summoner.summonerLevel }}
+            &nbsp;|&nbsp;
+            <b>IconId:</b> {{ b.summoner.profileIconId }}
+            &nbsp;|&nbsp;
+            <b>DDragon:</b> {{ ddVersion() || '...' }}
+          </p>
+          <!-- Rank -->
+          @if (b.rank?.length) {
+            <div>
+              <h3>Ranked</h3>
+              @for (r of b.rank; track r) {
+                <div style="border:1px solid #ddd; padding:8px; margin:6px 0">
+                  <b>{{ r.queueType }}</b> — {{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)
+                  <div>W/L: {{ r.wins }}/{{ r.losses }}</div>
                 </div>
-              </div>
+              }
             </div>
-
-            <div *ngIf="!playerInMatch(m, b.account.puuid)" style="margin-top:6px">
-              <i>Nu am găsit participantul în acest match (debug).</i>
+          }
+          @if (b.matchIds?.length === 0) {
+            <div>
+              Nu există meciuri pentru acest cont (sau e cont nou).
             </div>
-          </div>
+          }
+          <!-- Match history -->
+          @if (b.matches?.length) {
+            <div>
+              <h3>Match history (primele {{ b.matches.length }})</h3>
+              @for (m of b.matches; track m) {
+                <div
+                  style="border:1px solid #ccc; padding:10px; margin:8px 0"
+                  >
+                  <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap">
+                    <div>
+                      <b>{{ queueName(m.info?.queueId) }}</b>
+                    </div>
+                    <div>
+                      <b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min
+                    </div>
+                  </div>
+                  <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
+                  <!-- Player summary -->
+                  @if (playerInMatch(m, b.account.puuid); as p) {
+                    <div style="margin-top:10px">
+                      <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
+                        <!-- Champion icon -->
+                        @if (champIconUrl(p.championId); as cicon) {
+                          <img
+                            [src]="cicon"
+                            width="52"
+                            height="52"
+                            style="border-radius:12px; border:1px solid #ddd"
+                            />
+                        }
+                        <div style="flex:1; min-width:240px">
+                          <div style="font-weight:700">
+                            {{ champName(p.championId) || 'Champion #' + p.championId }}
+                            <span style="font-weight:400; opacity:.8"> — {{ p.win ? 'WIN' : 'LOSS' }}</span>
+                          </div>
+                          <div><b>KDA:</b> {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</div>
+                          <!-- Spells + Items row -->
+                          <div
+                            style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
+                            >
+                            <!-- Spells -->
+                            @if (spellIconUrl(p.summoner1Id); as s1) {
+                              <img
+                                [src]="s1"
+                                width="26"
+                                height="26"
+                                style="border-radius:6px; border:1px solid #ddd"
+                                title="Spell 1"
+                                />
+                            }
+                            @if (spellIconUrl(p.summoner2Id); as s2) {
+                              <img
+                                [src]="s2"
+                                width="26"
+                                height="26"
+                                style="border-radius:6px; border:1px solid #ddd"
+                                title="Spell 2"
+                                />
+                            }
+                            <!-- Items -->
+                            @for (it of itemIds(p); track it) {
+                              @if (itemIconUrl(it); as iu) {
+                                <img
+                                  [src]="iu"
+                                  width="26"
+                                  height="26"
+                                  style="border-radius:6px; border:1px solid #ddd"
+                                  [title]="'Item ' + it"
+                                  />
+                              }
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  @if (!playerInMatch(m, b.account.puuid)) {
+                    <div style="margin-top:6px">
+                      <i>Nu am găsit participantul în acest match (debug).</i>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+          <details style="margin-top:12px">
+            <summary>Debug JSON</summary>
+            <pre>{{ b | json }}</pre>
+          </details>
         </div>
-
-        <details style="margin-top:12px">
-          <summary>Debug JSON</summary>
-          <pre>{{ b | json }}</pre>
-        </details>
-      </div>
+      }
     </div>
-  `,
+    `,
 })
 export class SummonerComponent {
   private route = inject(ActivatedRoute);
