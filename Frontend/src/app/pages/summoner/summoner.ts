@@ -57,6 +57,22 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
           <b>DDragon:</b> {{ ddVersion() || '...' }}
         </p>
 
+        <!-- ✅ Current Game -->
+        @if (b.currentGame) {
+        <div style="border:1px solid #ddd; padding:10px; border-radius:10px; margin:10px 0;">
+          <h3>✅ Currently In Game</h3>
+          <div><b>GameId:</b> {{ b.currentGame.gameId }}</div>
+          <div><b>Queue:</b> {{ queueName(b.currentGame.gameQueueConfigId) }}</div>
+          <div><b>Started:</b> {{ b.currentGame.gameStartTime }}</div>
+        </div>
+        } @else {
+        <div
+          style="border:1px solid #eee; padding:10px; border-radius:10px; margin:10px 0; opacity:.85;"
+        >
+          <h3>⏸ Not in game</h3>
+        </div>
+        }
+
         <!-- Rank -->
         @if (b.rank?.length) {
         <div>
@@ -65,6 +81,34 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
           <div style="border:1px solid #ddd; padding:8px; margin:6px 0">
             <b>{{ r.queueType }}</b> — {{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)
             <div>W/L: {{ r.wins }}/{{ r.losses }}</div>
+          </div>
+          }
+        </div>
+        }
+
+        <!-- ✅ Top Mastery -->
+        @if (b.masteries?.length) {
+        <h3>Top Mastery</h3>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+          @for (m of b.masteries.slice(0, 8); track m) {
+          <div style="border:1px solid #ddd; padding:10px; border-radius:12px; min-width:220px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              @if (masteryChampIconUrl(m.championId); as ic) {
+              <img
+                [src]="ic"
+                width="40"
+                height="40"
+                style="border-radius:10px; border:1px solid #ddd"
+              />
+              }
+              <div>
+                <div style="font-weight:700">
+                  {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
+                </div>
+                <div><b>Level:</b> {{ m.championLevel }}</div>
+                <div><b>Points:</b> {{ m.championPoints }}</div>
+              </div>
+            </div>
           </div>
           }
         </div>
@@ -89,6 +133,8 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
             </div>
 
             <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
+
+            <!-- ✅ Detalii (route către componenta Match) -->
             <button
               (click)="openMatch(m.metadata?.matchId, b.account.puuid)"
               style="margin-top:6px"
@@ -156,7 +202,7 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
                 </div>
               </div>
             </div>
-            } @if (!playerInMatch(m, b.account.puuid)) {
+            } @else {
             <div style="margin-top:6px">
               <i>Nu am găsit participantul în acest match (debug).</i>
             </div>
@@ -217,7 +263,7 @@ export class SummonerComponent {
       error: () => this.spellsByKey.set({}),
     });
 
-    // ✅ LIPSEA: items map (pt title/nume)
+    // ✅ items map (pt title/nume)
     this.champs.getItemsById().subscribe({
       next: (m) => this.itemsById.set(m),
       error: () => this.itemsById.set({}),
@@ -251,12 +297,32 @@ export class SummonerComponent {
   home() {
     this.router.navigate(['/']);
   }
-  openMatch(matchId: string | undefined, puuid: string) {
-    if (!matchId) return;
 
-    this.router.navigate(['/match', this.region, matchId], {
-      queryParams: { puuid }, // ca să știm pe cine evidențiem în MatchComponent
-    });
+  /**
+   * ✅ păstrez funcția "openMatch" dar o fac să meargă și cu:
+   * - openMatch(matchId, puuid)  (cum ai în template acum)
+   * - openMatch(bundle, match)   (varianta veche)
+   */
+  openMatch(arg1: any, arg2?: any) {
+    const routing = REGION_TO_ROUTING[this.region];
+
+    // varianta nouă: (matchId, puuid)
+    if (typeof arg1 === 'string') {
+      const matchId = arg1;
+      const puuid = arg2;
+      if (!matchId || !puuid) return;
+      this.router.navigate(['/match', routing, matchId, puuid]);
+      return;
+    }
+
+    // varianta veche: (bundle, match)
+    const b = arg1;
+    const m = arg2;
+    const matchId = m?.metadata?.matchId;
+    const puuid = b?.account?.puuid;
+    if (!matchId || !puuid) return;
+
+    this.router.navigate(['/match', routing, matchId, puuid]);
   }
 
   queueName(queueId?: number) {
@@ -274,7 +340,7 @@ export class SummonerComponent {
     return this.ddVersion() || this.ddragon.getVersionSync() || '14.1.1';
   }
 
-  // ====== Champion / Spells / Items helpers (folosind ChampionService-ul tău) ======
+  // ====== Champion / Spells / Items helpers ======
   champName(championId?: number) {
     return this.champs.championNameByNumericKeySync(championId ?? 0, this.championsByKey());
   }
@@ -313,10 +379,23 @@ export class SummonerComponent {
   }
 
   itemIds(p: any): number[] {
-    // item0..item6 există în match-v5 participant
     return [p?.item0, p?.item1, p?.item2, p?.item3, p?.item4, p?.item5, p?.item6]
       .map((x: any) => Number(x ?? 0))
       .filter((x) => !!x && x > 0);
+  }
+
+  // ✅ Mastery helpers (championId numeric)
+  masteryChampName(championId?: number) {
+    return this.champs.championNameByNumericKeySync(championId ?? 0, this.championsByKey());
+  }
+
+  masteryChampIconUrl(championId?: number) {
+    const url = this.champs.championSquareUrlByNumericKeySync(
+      championId ?? 0,
+      this.championsByKey(),
+      this.ddVer()
+    );
+    return url || null;
   }
 
   // ====== fallback EUW <-> EUNE pentru summoner lookup ======
@@ -356,10 +435,26 @@ export class SummonerComponent {
           )
         ),
 
-        // 2) rank + matchIds
+        // 2) rank + currentGame + masteries + matchIds
         switchMap(({ account, summoner, platform }) =>
           forkJoin({
             rank: summoner?.id ? this.riot.getRankBySummonerId(platform, summoner.id) : of([]),
+
+            // ✅ current game (404 => null, normal)
+            currentGame: summoner?.id
+              ? this.riot.getCurrentGame(platform, summoner.id).pipe(
+                  catchError((err) => {
+                    if (err?.status === 404) return of(null);
+                    return throwError(() => err);
+                  })
+                )
+              : of(null),
+
+            // ✅ mastery (dacă dă eroare, nu omorâm pagina)
+            masteries: summoner?.id
+              ? this.riot.getChampionMasteries(platform, summoner.id).pipe(catchError(() => of([])))
+              : of([]),
+
             matchIds: this.riot.matchIdsByPuuid(routing, account.puuid, 0, 20),
           }).pipe(map((extra) => ({ account, summoner, platform, ...extra })))
         ),

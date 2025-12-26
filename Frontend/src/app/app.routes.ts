@@ -10,6 +10,9 @@ export const routes: Routes = [
     path: 'summoner/:region/:gameName/:tagLine',
     loadComponent: () => import('./pages/summoner/summoner').then((m) => m.SummonerComponent),
   },
-  { path: 'match/:region/:matchId', component: MatchComponent },
+  {
+    path: 'match/:region/:matchId',
+    loadComponent: () => import('./pages/match/match').then((m) => m.MatchComponent),
+  },
   { path: '**', redirectTo: '' },
 ];
