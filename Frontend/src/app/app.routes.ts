@@ -11,7 +11,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/summoner/summoner').then((m) => m.SummonerComponent),
   },
   {
-    path: 'match/:region/:matchId',
+    path: 'match/:routing/:matchId/:puuid',
     loadComponent: () => import('./pages/match/match').then((m) => m.MatchComponent),
   },
   { path: '**', redirectTo: '' },
