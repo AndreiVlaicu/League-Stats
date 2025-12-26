@@ -29,8 +29,34 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
           <option>NA</option>
         </select>
 
-        <input [(ngModel)]="gameName" placeholder="gameName" />
-        <input [(ngModel)]="tagLine" placeholder="tagLine" />
+        <!-- ✅ NOU: combo (alegi din listă sau scrii manual Caps#G2) -->
+        <input
+          [(ngModel)]="playerInput"
+          list="playerList"
+          placeholder="Alege / scrie: gameName#tagLine (ex: Caps#G2)"
+          (ngModelChange)="applyPlayerInput($event)"
+        />
+
+        <datalist id="playerList">
+          @for (p of presets; track p.label) {
+          <option [value]="p.gameName + '#' + p.tagLine">{{ p.label }}</option>
+          }
+        </datalist>
+
+        <!-- ✅ EXISTENTE: rămân input-urile separate (dar le dau și autosuggest) -->
+        <input [(ngModel)]="gameName" placeholder="gameName" list="gameNameList" />
+        <datalist id="gameNameList">
+          @for (g of uniqueGameNames(); track g) {
+          <option [value]="g"></option>
+          }
+        </datalist>
+
+        <input [(ngModel)]="tagLine" placeholder="tagLine" list="tagLineList" />
+        <datalist id="tagLineList">
+          @for (t of uniqueTagLines(); track t) {
+          <option [value]="t"></option>
+          }
+        </datalist>
 
         <button (click)="go()">Caută</button>
         <button (click)="back()">Înapoi</button>
@@ -64,6 +90,9 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '..
           <div><b>GameId:</b> {{ b.currentGame.gameId }}</div>
           <div><b>Queue:</b> {{ queueName(b.currentGame.gameQueueConfigId) }}</div>
           <div><b>Started:</b> {{ b.currentGame.gameStartTime }}</div>
+          <button (click)="openLive(b.platform, b.summoner.id)" style="margin-top:8px;">
+            Live details
+          </button>
         </div>
         } @else {
         <div
@@ -245,6 +274,57 @@ export class SummonerComponent {
   championsByKey = signal<Record<string, ChampionData>>({});
   spellsByKey = signal<Record<string, SummonerSpellData>>({});
   itemsById = signal<Record<string, ItemData>>({});
+  // ✅ NOU: combo input (Caps#G2)
+  playerInput = '';
+
+  // ✅ Presets (poți pune ce conturi vrei)
+  presets: Array<{ region: RegionUI; gameName: string; tagLine: string; label: string }> = [
+    { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
+    { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
+    // adaugă aici alte conturi:
+    // { region:'EUNE', gameName:'X', tagLine:'Y', label:'X#Y (EUNE)' },
+  ];
+
+  // sugestii pt input-urile separate
+  uniqueGameNames(): string[] {
+    return Array.from(new Set(this.presets.map((p) => p.gameName))).sort();
+  }
+  uniqueTagLines(): string[] {
+    return Array.from(new Set(this.presets.map((p) => p.tagLine))).sort();
+  }
+
+  // ✅ când alegi/scrii în combo, îți completează gameName+tagLine (+ region dacă e preset)
+  applyPlayerInput(value?: string) {
+    const raw = (value ?? this.playerInput ?? '').trim();
+    if (!raw) return;
+
+    // 1) dacă se potrivește cu un preset, setăm TOT (inclusiv region)
+    const preset = this.presets.find((p) => {
+      const k1 = `${p.gameName}#${p.tagLine}`.toLowerCase();
+      const k2 = (p.label || '').toLowerCase();
+      const r = raw.toLowerCase();
+      return r === k1 || r === k2;
+    });
+
+    if (preset) {
+      this.region = preset.region;
+      this.gameName = preset.gameName;
+      this.tagLine = preset.tagLine;
+      return;
+    }
+
+    // 2) dacă user scrie manual "gameName#tagLine"
+    if (raw.includes('#')) {
+      const [g, t] = raw.split('#');
+      const gg = (g ?? '').trim();
+      const tt = (t ?? '').trim();
+      if (gg) this.gameName = gg;
+      if (tt) this.tagLine = tt;
+    } else {
+      // a scris doar gameName
+      this.gameName = raw;
+    }
+  }
 
   ngOnInit() {
     // ✅ preload DataDragon (prin /champion-data proxy)
@@ -283,6 +363,18 @@ export class SummonerComponent {
   }
 
   go() {
+    // ✅ suport extra: dacă ai scris Caps#G2 în combo și încă nu ai completat separat
+    if ((!this.gameName || !this.tagLine) && (this.playerInput || '').includes('#')) {
+      this.applyPlayerInput(this.playerInput);
+    }
+
+    // ✅ suport extra: dacă cineva scrie Caps#G2 direct în gameName
+    if (this.gameName.includes('#') && !this.tagLine) {
+      const [g, t] = this.gameName.split('#');
+      this.gameName = (g ?? '').trim();
+      this.tagLine = (t ?? '').trim();
+    }
+
     const g = this.gameName.trim();
     const t = this.tagLine.trim();
     if (!g || !t) return;
@@ -296,6 +388,11 @@ export class SummonerComponent {
 
   home() {
     this.router.navigate(['/']);
+  }
+
+  openLive(platform: string, summonerId: string) {
+    if (!platform || !summonerId) return;
+    this.router.navigate(['/live', platform, summonerId]);
   }
 
   /**
