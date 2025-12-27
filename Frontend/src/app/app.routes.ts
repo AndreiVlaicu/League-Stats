@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MatchComponent } from './pages/match/match';
 import { LiveGameComponent } from './pages/live-game/live-game';
+import { SummonerByPuuidComponent } from './pages/summoner-by-puuid/summoner-by-puuid';
 
 export const routes: Routes = [
   {
@@ -16,5 +17,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/match/match').then((m) => m.MatchComponent),
   },
   { path: 'live/:platform/:summonerId', component: LiveGameComponent },
+  { path: 'summoner-puuid/:region/:puuid', component: SummonerByPuuidComponent },
   { path: '**', redirectTo: '' },
 ];

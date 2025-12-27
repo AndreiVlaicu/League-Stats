@@ -11,7 +11,7 @@ import {
   ChampionData,
   SummonerSpellData,
 } from '../../core/services/champion.service';
-import { QUEUE_NAMES } from '../../core/regions';
+import { QUEUE_NAMES, RegionUI } from '../../core/regions';
 
 type TeamId = 100 | 200;
 
@@ -120,6 +120,9 @@ type TeamId = 100 | 200;
                   />
                   }
                 </div>
+                <button (click)="openByPuuid(p.puuid)" style="margin-top:6px">
+                  Deschide profil
+                </button>
               </div>
             </div>
           </div>
@@ -177,6 +180,9 @@ type TeamId = 100 | 200;
                   />
                   }
                 </div>
+                <button (click)="openByPuuid(p.puuid)" style="margin-top:6px">
+                  Deschide profil
+                </button>
               </div>
             </div>
           </div>
@@ -242,6 +248,20 @@ export class LiveGameComponent {
   }
   home() {
     this.router.navigate(['/']);
+  }
+
+  private regionFromPlatform(platform: string): RegionUI {
+    const p = (platform || '').toLowerCase();
+    if (p.startsWith('euw')) return 'EUW';
+    if (p.startsWith('eun')) return 'EUNE';
+    if (p.startsWith('na')) return 'NA';
+    return 'EUW';
+  }
+
+  openByPuuid(puuid: string) {
+    if (!puuid) return;
+    const region = this.regionFromPlatform(this.platform());
+    this.router.navigate(['/summoner-puuid', region, puuid]);
   }
 
   private ddVer(): string {
