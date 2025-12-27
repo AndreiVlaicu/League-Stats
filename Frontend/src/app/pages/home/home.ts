@@ -12,70 +12,8 @@ import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING } from '../../core/regi
   standalone: true,
   selector: 'app-home',
   imports: [CommonModule, FormsModule],
-  template: `
-    <div style="padding:16px">
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-        <select [(ngModel)]="region">
-          <option>EUW</option>
-          <option>EUNE</option>
-          <option>NA</option>
-        </select>
-
-        <!-- ✅ Combo: alegi din listă sau scrii manual Caps#G2 -->
-        <input
-          [(ngModel)]="playerInput"
-          list="playerList"
-          placeholder="Alege / scrie: gameName#tagLine (ex: Caps#G2)"
-          (ngModelChange)="applyPlayerInput($event)"
-        />
-
-        <datalist id="playerList">
-          @for (p of presets; track p.label) {
-          <option [value]="p.gameName + '#' + p.tagLine">{{ p.label }}</option>
-          }
-        </datalist>
-
-        <!-- ✅ Rămân input-urile separate -->
-        <input [(ngModel)]="gameName" placeholder="gameName" list="gameNameList" />
-        <datalist id="gameNameList">
-          @for (g of uniqueGameNames(); track g) {
-          <option [value]="g"></option>
-          }
-        </datalist>
-
-        <input [(ngModel)]="tagLine" placeholder="tagLine" list="tagLineList" />
-        <datalist id="tagLineList">
-          @for (t of uniqueTagLines(); track t) {
-          <option [value]="t"></option>
-          }
-        </datalist>
-
-        <button (click)="search()">Caută</button>
-        <button (click)="openSummoner()">Deschide Summoner</button>
-      </div>
-
-      @if (loading()) {
-      <p>Loading...</p>
-      } @if (error()) {
-      <p>{{ error() }}</p>
-      } @if (data(); as d) {
-      <pre>{{ d | json }}</pre>
-      } @if (data() && data().matchIds?.length === 0) {
-      <p>Nu există meciuri pentru acest cont (sau e un cont nou). Încearcă alt Riot ID.</p>
-      } @if (data()?.matches?.length) {
-      <div>
-        <h3>Match history (primele 5)</h3>
-        @for (m of data().matches; track m) {
-        <div style="border:1px solid #ccc; padding:8px; margin:6px 0">
-          <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
-          <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
-          <div><b>Queue:</b> {{ m.info?.queueId }}</div>
-        </div>
-        }
-      </div>
-      }
-    </div>
-  `,
+  templateUrl: './home.html',
+  styleUrls: ['./home.css'],
 })
 export class HomeComponent {
   private riot = inject(RiotApiService);
@@ -96,6 +34,8 @@ export class HomeComponent {
   presets: Array<{ region: RegionUI; gameName: string; tagLine: string; label: string }> = [
     { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
     { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
+    { region: 'EUNE', gameName: 'Gimishoor', tagLine: '1337', label: 'Gimishoor#1337 (EUNE)' },
+
   ];
 
   uniqueGameNames(): string[] {

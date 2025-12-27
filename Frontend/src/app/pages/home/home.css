@@ -1,0 +1,186 @@
+.home-container {
+  min-height: 100vh;
+  background: #1a1a1a;
+  padding: 40px 20px;
+}
+
+.search-card {
+  max-width: 700px;
+  margin: 0 auto;
+  background: #2a2a2a;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 30px;
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #4ade80;
+  margin: 0 0 8px 0;
+}
+
+.logo p {
+  color: #9ca3af;
+  margin: 0;
+  font-size: 14px;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid #3f3f3f;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #1f1f1f;
+  color: #e5e5e5;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4ade80;
+}
+
+.input::placeholder {
+  color: #6b7280;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #22c55e;
+  color: #1a1a1a;
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn-secondary {
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn-secondary:hover {
+  background: #525252;
+}
+
+.message {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.loading {
+  background: #1f2937;
+  color: #4ade80;
+}
+
+.error {
+  background: #3f1f1f;
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+.warning {
+  background: #3f3f1f;
+  color: #fcd34d;
+}
+
+.matches {
+  margin-top: 24px;
+}
+
+.matches h3 {
+  color: #4ade80;
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.match-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.match-card div {
+  margin: 3px 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.match-card b {
+  color: #e5e5e5;
+}
+
+.debug {
+  margin-top: 20px;
+  padding: 12px;
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 6px;
+}
+
+.debug summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.debug pre {
+  margin: 12px 0 0 0;
+  font-size: 12px;
+  color: #d1d5db;
+  max-height: 300px;
+  overflow: auto;
+}
+
+@media (max-width: 640px) {
+  .search-card {
+    padding: 20px;
+  }
+
+  .input-row {
+    flex-direction: column;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+}

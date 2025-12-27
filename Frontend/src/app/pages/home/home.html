@@ -1,1 +1,81 @@
-<p>home works!</p>
+<div class="home-container">
+  <div class="search-card">
+    <div class="logo">
+      <h1>Arena Analytics</h1>
+      <p>League of Legends Stats</p>
+    </div>
+
+    <div class="search-form">
+      <div class="input-row">
+        <select [(ngModel)]="region" class="input">
+          <option>EUW</option>
+          <option>EUNE</option>
+          <option>NA</option>
+        </select>
+
+        <input
+          [(ngModel)]="playerInput"
+          list="playerList"
+          placeholder="gameName#tagLine (e.g., Caps#G2)"
+          class="input flex-1"
+          (ngModelChange)="applyPlayerInput($event)"
+        />
+
+        <datalist id="playerList">
+          @for (p of presets; track p.label) {
+          <option [value]="p.gameName + '#' + p.tagLine">{{ p.label }}</option>
+          }
+        </datalist>
+      </div>
+
+      <div class="input-row">
+        <input
+          [(ngModel)]="gameName"
+          placeholder="Game Name"
+          list="gameNameList"
+          class="input flex-1"
+        />
+        <datalist id="gameNameList">
+          @for (g of uniqueGameNames(); track g) {
+          <option [value]="g"></option>
+          }
+        </datalist>
+
+        <input [(ngModel)]="tagLine" placeholder="Tag Line" list="tagLineList" class="input flex-1" />
+        <datalist id="tagLineList">
+          @for (t of uniqueTagLines(); track t) {
+          <option [value]="t"></option>
+          }
+        </datalist>
+      </div>
+
+      <div class="button-row">
+        <button (click)="openSummoner()" class="btn btn-primary">View Profile</button>
+        <button (click)="search()" class="btn btn-secondary">Quick Search</button>
+      </div>
+    </div>
+
+    @if (loading()) {
+    <div class="message loading">Loading...</div>
+    } @if (error()) {
+    <div class="message error">{{ error() }}</div>
+    } @if (data() && data().matchIds?.length === 0) {
+    <div class="message warning">No matches found. Try another Riot ID.</div>
+    } @if (data()?.matches?.length) {
+    <div class="matches">
+      <h3>Recent Matches</h3>
+      @for (m of data().matches; track m) {
+      <div class="match-card">
+        <div><b>Match:</b> {{ m.metadata?.matchId }}</div>
+        <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
+      </div>
+      }
+    </div>
+    } @if (data(); as d) {
+    <details class="debug">
+      <summary>Debug Data</summary>
+      <pre>{{ d | json }}</pre>
+    </details>
+    }
+  </div>
+</div>
