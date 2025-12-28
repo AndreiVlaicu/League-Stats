@@ -1,1 +1,202 @@
-<p>summoner works!</p>
+<div class="summoner-container">
+  <div class="summoner-card">
+    <div class="search-bar">
+      <select [(ngModel)]="region" class="input">
+        <option>EUW</option>
+        <option>EUNE</option>
+        <option>NA</option>
+      </select>
+
+      <input
+        [(ngModel)]="playerInput"
+        list="playerList"
+        placeholder="gameName#tagLine (e.g., Caps#G2)"
+        class="input flex-1"
+        (ngModelChange)="applyPlayerInput($event)"
+      />
+
+      <datalist id="playerList">
+        @for (p of presets; track p.label) {
+        <option [value]="p.gameName + '#' + p.tagLine">{{ p.label }}</option>
+        }
+      </datalist>
+
+      <input [(ngModel)]="gameName" placeholder="Game Name" list="gameNameList" class="input" />
+      <datalist id="gameNameList">
+        @for (g of uniqueGameNames(); track g) {
+        <option [value]="g"></option>
+        }
+      </datalist>
+
+      <input [(ngModel)]="tagLine" placeholder="Tag Line" list="tagLineList" class="input" />
+      <datalist id="tagLineList">
+        @for (t of uniqueTagLines(); track t) {
+        <option [value]="t"></option>
+        }
+      </datalist>
+
+      <button (click)="go()" class="btn btn-primary">Search</button>
+      <button (click)="back()" class="btn btn-secondary">Back</button>
+      <button (click)="home()" class="btn btn-secondary">Home</button>
+    </div>
+
+    @if (loading()) {
+    <div class="message loading">Loading...</div>
+    } @if (error()) {
+    <div class="message error">{{ error() }}</div>
+    } @if (bundle(); as b) {
+    <div class="profile">
+      <div class="profile-header">
+        <div class="profile-main">
+          @if (profileIconUrl(b.summoner.profileIconId); as iconUrl) {
+          <img [src]="iconUrl" class="profile-icon" [alt]="'Profile Icon ' + b.summoner.profileIconId" />
+          }
+          <div class="profile-text">
+            <h2>{{ b.account.gameName }}#{{ b.account.tagLine }}</h2>
+            <div class="profile-info">
+              <span><b>Platform:</b> {{ b.platform }}</span>
+              <span><b>Level:</b> {{ b.summoner.summonerLevel }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      @if (b.currentGame) {
+      <div class="current-game in-game">
+        <h3>✅ Currently In Game</h3>
+        <div><b>GameId:</b> {{ b.currentGame.gameId }}</div>
+        <div><b>Queue:</b> {{ queueName(b.currentGame.gameQueueConfigId) }}</div>
+        <div><b>Started:</b> {{ b.currentGame.gameStartTime }}</div>
+        <button (click)="openLive(b.platform, b.summoner.id)" class="btn btn-primary">
+          Live Details
+        </button>
+      </div>
+      } @else {
+      <div class="current-game not-in-game">
+        <h3>⏸ Not in game</h3>
+      </div>
+      }
+
+      @if (b.rank?.length) {
+      <div class="section">
+        <h3>Ranked</h3>
+        <div class="rank-list">
+          @for (r of b.rank; track r) {
+          <div class="rank-card">
+            <div><b>{{ r.queueType }}</b></div>
+            <div>{{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)</div>
+            <div>W/L: {{ r.wins }}/{{ r.losses }}</div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @if (b.masteries?.length) {
+      <div class="section">
+        <h3>Top Mastery</h3>
+        <div class="mastery-grid">
+          @for (m of b.masteries.slice(0, 8); track m) {
+          <div class="mastery-card">
+            <div class="mastery-content">
+              @if (masteryChampIconUrl(m.championId); as ic) {
+              <img
+                [src]="ic"
+                width="40"
+                height="40"
+                class="champ-icon"
+                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId"
+              />
+              }
+              <div>
+                <div class="champ-name">
+                  {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
+                </div>
+                <div><b>Level:</b> {{ m.championLevel }}</div>
+                <div><b>Points:</b> {{ m.championPoints }}</div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
+      @if (b.matchIds?.length === 0) {
+      <div class="message warning">No matches found for this account.</div>
+      }
+
+      @if (b.matches?.length) {
+      <div class="section">
+        <h3>Match History ({{ b.matches.length }})</h3>
+
+        @for (m of b.matches; track m) {
+        <div class="match-card">
+          <div class="match-header">
+            <div><b>{{ queueName(m.info?.queueId) }}</b></div>
+            <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
+          </div>
+
+          <div class="match-id">{{ m.metadata?.matchId }}</div>
+
+          <button (click)="openMatch(m.metadata?.matchId, b.account.puuid)" class="btn btn-primary">
+            Details
+          </button>
+
+          @if (playerInMatch(m, b.account.puuid); as p) {
+          <div class="player-summary">
+            <div class="player-content">
+              @if (champIconUrl(p.championId); as cicon) {
+              <img
+                [src]="cicon"
+                width="52"
+                height="52"
+                class="champ-icon-lg"
+                [title]="champName(p.championId) || 'Champion #' + p.championId"
+              />
+              }
+
+              <div class="player-info">
+                <div class="player-champ">
+                  {{ champName(p.championId) || 'Champion #' + p.championId }}
+                  <span [class]="p.win ? 'win' : 'loss'">{{ p.win ? 'WIN' : 'LOSS' }}</span>
+                </div>
+
+                <div><b>KDA:</b> {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</div>
+
+                <div class="items-row">
+                  @if (spellIconUrl(p.summoner1Id); as s1) {
+                  <img
+                    [src]="s1"
+                    width="26"
+                    height="26"
+                    class="item-icon"
+                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
+                  />
+                  } @if (spellIconUrl(p.summoner2Id); as s2) {
+                  <img
+                    [src]="s2"
+                    width="26"
+                    height="26"
+                    class="item-icon"
+                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
+                  />
+                  } @for (it of itemIds(p); track it) { @if (itemIconUrl(it); as iu) {
+                  <img [src]="iu" width="26" height="26" class="item-icon" [title]="itemTitle(it)" />
+                  } }
+                </div>
+              </div>
+            </div>
+          </div>
+          } @else {
+          <div class="player-not-found">Player not found in this match.</div>
+          }
+        </div>
+        }
+      </div>
+      }
+
+    </div>
+    }
+  </div>
+</div>

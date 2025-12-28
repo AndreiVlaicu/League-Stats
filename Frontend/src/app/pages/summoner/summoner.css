@@ -1,0 +1,355 @@
+.summoner-container {
+  min-height: 100vh;
+  background: #1a1a1a;
+  padding: 20px;
+}
+
+.summoner-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #2a2a2a;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+}
+
+.search-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #3f3f3f;
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid #3f3f3f;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #1f1f1f;
+  color: #e5e5e5;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4ade80;
+}
+
+.input::placeholder {
+  color: #6b7280;
+}
+
+.flex-1 {
+  flex: 1;
+  min-width: 200px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #22c55e;
+  color: #1a1a1a;
+}
+
+.btn-primary:hover {
+  background: #16a34a;
+}
+
+.btn-secondary {
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn-secondary:hover {
+  background: #525252;
+}
+
+.message {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.loading {
+  background: #1f2937;
+  color: #4ade80;
+}
+
+.error {
+  background: #3f1f1f;
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+.warning {
+  background: #3f3f1f;
+  color: #fcd34d;
+}
+
+.profile-header {
+  margin-bottom: 20px;
+}
+
+.profile-main {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.profile-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  border: 2px solid #4ade80;
+  box-shadow: 0 2px 8px rgba(74, 222, 128, 0.3);
+}
+
+.profile-text {
+  flex: 1;
+}
+
+.profile-header h2 {
+  color: #4ade80;
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+
+.profile-info {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.profile-info b {
+  color: #e5e5e5;
+}
+
+.current-game {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #3f3f3f;
+}
+
+.in-game {
+  background: #1f3f1f;
+  border-color: #22c55e;
+}
+
+.not-in-game {
+  background: #1f1f1f;
+  opacity: 0.8;
+}
+
+.current-game h3 {
+  color: #e5e5e5;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.current-game div {
+  color: #9ca3af;
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.current-game b {
+  color: #e5e5e5;
+}
+
+.current-game .btn {
+  margin-top: 10px;
+}
+
+.section {
+  margin: 24px 0;
+}
+
+.section h3 {
+  color: #4ade80;
+  margin: 0 0 12px 0;
+  font-size: 18px;
+}
+
+.rank-list {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rank-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 6px;
+  padding: 12px;
+  min-width: 200px;
+}
+
+.rank-card div {
+  color: #9ca3af;
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.rank-card b {
+  color: #e5e5e5;
+}
+
+.mastery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.mastery-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.mastery-content {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.mastery-content div {
+  color: #9ca3af;
+  font-size: 13px;
+  margin: 2px 0;
+}
+
+.mastery-content b {
+  color: #e5e5e5;
+}
+
+.champ-name {
+  font-weight: 600;
+  color: #e5e5e5 !important;
+  margin-bottom: 4px !important;
+}
+
+.champ-icon,
+.champ-icon-lg,
+.item-icon {
+  border-radius: 6px;
+  border: 1px solid #3f3f3f;
+}
+
+.match-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.match-header div {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.match-header b {
+  color: #e5e5e5;
+}
+
+.match-id {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.player-summary {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #3f3f3f;
+}
+
+.player-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-info div {
+  color: #9ca3af;
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.player-info b {
+  color: #e5e5e5;
+}
+
+.player-champ {
+  font-weight: 600;
+  color: #e5e5e5 !important;
+  font-size: 15px !important;
+}
+
+.player-champ .win {
+  color: #22c55e;
+  font-weight: 500;
+}
+
+.player-champ .loss {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.items-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.player-not-found {
+  color: #6b7280;
+  font-style: italic;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+@media (max-width: 768px) {
+  .summoner-card {
+    padding: 16px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .mastery-grid {
+    grid-template-columns: 1fr;
+  }
+}

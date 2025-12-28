@@ -149,28 +149,6 @@
   color: #e5e5e5;
 }
 
-.debug {
-  margin-top: 20px;
-  padding: 12px;
-  background: #1f1f1f;
-  border: 1px solid #3f3f3f;
-  border-radius: 6px;
-}
-
-.debug summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: #9ca3af;
-}
-
-.debug pre {
-  margin: 12px 0 0 0;
-  font-size: 12px;
-  color: #d1d5db;
-  max-height: 300px;
-  overflow: auto;
-}
-
 @media (max-width: 640px) {
   .search-card {
     padding: 20px;
