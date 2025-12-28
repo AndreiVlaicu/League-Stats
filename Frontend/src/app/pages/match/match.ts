@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, Pipe, PipeTransform } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
@@ -31,339 +31,23 @@ type ObjectiveEventVM = {
   teamId?: TeamId | null;
 };
 
+@Pipe({
+  name: 'filter',
+  standalone: true,
+})
+export class FilterPipe implements PipeTransform {
+  transform(items: any[], property: string, value: any): any[] {
+    if (!items || !property) return items || [];
+    return items.filter((item) => item[property] === value);
+  }
+}
+
 @Component({
   standalone: true,
   selector: 'app-match',
-  imports: [CommonModule],
-  template: `
-    <div style="padding:16px">
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
-        <button (click)="back()">Înapoi</button>
-        <button (click)="home()">Home</button>
-      </div>
-
-      <h2>Match Details</h2>
-
-      <p *ngIf="loading()">Loading...</p>
-      <p *ngIf="error()">{{ error() }}</p>
-
-      <div *ngIf="data() as d">
-        <p>
-          <b>Queue:</b> {{ queueName(d.match?.info?.queueId) }}
-          &nbsp;|&nbsp;
-          <b>Duration:</b> {{ (d.match?.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min
-          &nbsp;|&nbsp; <b>DDragon:</b> {{ ddVersion() || '...' }}
-        </p>
-
-        <!-- ✅ TEAM SUMMARY -->
-        <div
-          *ngIf="teams() as tmap"
-          style="border:1px solid #eee; padding:12px; border-radius:12px; margin:12px 0;"
-        >
-          <h3 style="margin:0 0 8px 0;">Team Summary</h3>
-
-          <div style="display:flex; gap:12px; flex-wrap:wrap;">
-            <!-- BLUE -->
-            <div
-              style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:12px; padding:10px;"
-            >
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; gap:10px;"
-              >
-                <b>Blue (100)</b>
-                <span style="font-weight:700">{{ tmap[100]?.win ? 'WIN' : 'LOSS' }}</span>
-              </div>
-
-              <div style="margin-top:6px; opacity:.95;">
-                <b>Kills:</b> {{ teamAgg()[100]?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Gold:</b> {{ teamAgg()[100]?.gold ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Dmg:</b> {{ teamAgg()[100]?.dmg ?? 0 }}
-              </div>
-
-              <div style="margin-top:6px; opacity:.95;">
-                <b>Towers:</b> {{ tmap[100]?.objectives?.tower?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Dragons:</b> {{ tmap[100]?.objectives?.dragon?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Baron:</b> {{ tmap[100]?.objectives?.baron?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Herald:</b> {{ tmap[100]?.objectives?.riftHerald?.kills ?? 0 }}
-              </div>
-            </div>
-
-            <!-- RED -->
-            <div
-              style="flex:1; min-width:320px; border:1px solid #ddd; border-radius:12px; padding:10px;"
-            >
-              <div
-                style="display:flex; justify-content:space-between; align-items:center; gap:10px;"
-              >
-                <b>Red (200)</b>
-                <span style="font-weight:700">{{ tmap[200]?.win ? 'WIN' : 'LOSS' }}</span>
-              </div>
-
-              <div style="margin-top:6px; opacity:.95;">
-                <b>Kills:</b> {{ teamAgg()[200]?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Gold:</b> {{ teamAgg()[200]?.gold ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Dmg:</b> {{ teamAgg()[200]?.dmg ?? 0 }}
-              </div>
-
-              <div style="margin-top:6px; opacity:.95;">
-                <b>Towers:</b> {{ tmap[200]?.objectives?.tower?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Dragons:</b> {{ tmap[200]?.objectives?.dragon?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Baron:</b> {{ tmap[200]?.objectives?.baron?.kills ?? 0 }}
-                &nbsp;|&nbsp;
-                <b>Herald:</b> {{ tmap[200]?.objectives?.riftHerald?.kills ?? 0 }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ✅ Player -->
-        <div
-          *ngIf="player() as p"
-          style="border:1px solid #ddd; padding:10px; border-radius:10px; margin:10px 0;"
-        >
-          <h3>Player (căutat)</h3>
-
-          <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">
-            <img
-              *ngIf="champIconUrl(p.championId) as cicon"
-              [src]="cicon"
-              width="52"
-              height="52"
-              style="border-radius:12px; border:1px solid #ddd"
-            />
-
-            <div>
-              <div style="font-weight:700">
-                {{ champName(p.championId) || 'Champion #' + p.championId }}
-                <span style="font-weight:400; opacity:.8"> — {{ p.win ? 'WIN' : 'LOSS' }}</span>
-              </div>
-
-              <div>
-                <b>KDA:</b> {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
-                &nbsp;|&nbsp;
-                <b>CS:</b> {{ cs(p) }}
-                &nbsp;|&nbsp;
-                <b>Vision:</b> {{ p.visionScore ?? 0 }}
-              </div>
-
-              <div
-                style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
-              >
-                <img
-                  *ngIf="spellIconUrl(p.summoner1Id) as s1"
-                  [src]="s1"
-                  width="26"
-                  height="26"
-                  style="border-radius:6px; border:1px solid #ddd"
-                  [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
-                />
-
-                <img
-                  *ngIf="spellIconUrl(p.summoner2Id) as s2"
-                  [src]="s2"
-                  width="26"
-                  height="26"
-                  style="border-radius:6px; border:1px solid #ddd"
-                  [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
-                />
-
-                <ng-container *ngFor="let it of itemIds(p)">
-                  <img
-                    *ngIf="itemIconUrl(it) as iu"
-                    [src]="iu"
-                    width="26"
-                    height="26"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="itemTitle(it)"
-                  />
-                </ng-container>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ✅ Timeline (Kills + Objectives) -->
-        <div
-          *ngIf="killFeed().length || objectiveFeed().length"
-          style="border:1px solid #eee; padding:12px; border-radius:12px; margin:12px 0;"
-        >
-          <h3 style="margin:0 0 10px 0;">Timeline</h3>
-
-          <div style="display:flex; gap:14px; flex-wrap:wrap;">
-            <!-- KILL FEED -->
-            <div style="flex:1; min-width:340px;">
-              <h4 style="margin:0 0 8px 0;">Kill feed</h4>
-
-              <div *ngIf="!killFeed().length" style="opacity:.8">No kill events.</div>
-
-              <div
-                *ngFor="let e of killFeed()"
-                style="display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #f1f1f1;"
-              >
-                <div style="width:44px; font-weight:700;">{{ e.minute }}'</div>
-
-                <!-- killer -->
-                <img
-                  *ngIf="e.killer?.championId && champIconUrl(e.killer?.championId) as kc"
-                  [src]="kc"
-                  width="22"
-                  height="22"
-                  style="border-radius:6px; border:1px solid #ddd"
-                  [title]="playerName(e.killer)"
-                />
-                <span style="font-weight:700">{{ playerName(e.killer) }}</span>
-
-                <span style="opacity:.7">killed</span>
-
-                <!-- victim -->
-                <img
-                  *ngIf="e.victim?.championId && champIconUrl(e.victim?.championId) as vc"
-                  [src]="vc"
-                  width="22"
-                  height="22"
-                  style="border-radius:6px; border:1px solid #ddd"
-                  [title]="playerName(e.victim)"
-                />
-                <span style="font-weight:700">{{ playerName(e.victim) }}</span>
-
-                <!-- assists -->
-                <span *ngIf="e.assists?.length" style="opacity:.75">
-                  (assists:
-                  <ng-container *ngFor="let a of e.assists; let last = last">
-                    {{ playerName(a) }}<span *ngIf="!last">, </span>
-                  </ng-container>
-                  )
-                </span>
-              </div>
-            </div>
-
-            <!-- OBJECTIVES -->
-            <div style="flex:1; min-width:340px;">
-              <h4 style="margin:0 0 8px 0;">Objectives</h4>
-
-              <div *ngIf="!objectiveFeed().length" style="opacity:.8">No objective events.</div>
-
-              <div
-                *ngFor="let o of objectiveFeed()"
-                style="display:flex; gap:10px; padding:6px 0; border-bottom:1px solid #f1f1f1;"
-              >
-                <div style="width:44px; font-weight:700;">{{ o.minute }}'</div>
-                <div style="flex:1;">
-                  <span style="font-weight:700">{{ o.text }}</span>
-                  <span *ngIf="o.killer" style="opacity:.85">
-                    — by {{ playerName(o.killer) }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          *ngIf="goldSeries().length"
-          style="border:1px solid #eee; padding:12px; border-radius:12px; margin:12px 0;"
-        >
-          <h3 style="margin:0 0 8px 0;">Gold diff by minute</h3>
-
-          <div
-            *ngFor="let g of goldSeries().slice(-12)"
-            style="display:flex; gap:10px; border-bottom:1px solid #f1f1f1; padding:6px 0;"
-          >
-            <div style="width:44px; font-weight:700;">{{ g.minute }}'</div>
-            <div style="flex:1; opacity:.9;">Blue {{ g.blueGold }} — Red {{ g.redGold }}</div>
-            <div style="width:110px; text-align:right; font-weight:700;">
-              {{ g.diff >= 0 ? '+' : '' }}{{ g.diff }}
-            </div>
-          </div>
-        </div>
-
-        <!-- ✅ Participants -->
-        <h3>Participants</h3>
-
-        <div
-          *ngFor="let p of d.match?.info?.participants"
-          style="border:1px solid #eee; padding:8px; margin:6px 0; border-radius:10px;"
-          [style.background]="p.puuid === puuid() ? '#f6f6f6' : 'transparent'"
-        >
-          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <div style="display:flex; gap:10px; align-items:flex-start;">
-              <img
-                *ngIf="champIconUrl(p.championId) as cicon"
-                [src]="cicon"
-                width="34"
-                height="34"
-                style="border-radius:10px; border:1px solid #ddd"
-              />
-
-              <div>
-                <div style="font-weight:700">
-                  {{ p.riotIdGameName || p.summonerName || 'Player' }}
-                  <span style="font-weight:400; opacity:.8">
-                    — {{ champName(p.championId) || '#' + p.championId }}
-                  </span>
-                </div>
-
-                <div style="opacity:.95">
-                  {{ p.win ? 'WIN' : 'LOSS' }}
-                  | KDA {{ p.kills }}/{{ p.deaths }}/{{ p.assists }} | CS {{ cs(p) }} | Vision
-                  {{ p.visionScore ?? 0 }}
-                </div>
-
-                <div
-                  style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
-                >
-                  <img
-                    *ngIf="spellIconUrl(p.summoner1Id) as s1"
-                    [src]="s1"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
-                  />
-                  <img
-                    *ngIf="spellIconUrl(p.summoner2Id) as s2"
-                    [src]="s2"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
-                  />
-
-                  <ng-container *ngFor="let it of itemIds(p)">
-                    <img
-                      *ngIf="itemIconUrl(it) as iu"
-                      [src]="iu"
-                      width="22"
-                      height="22"
-                      style="border-radius:6px; border:1px solid #ddd"
-                      [title]="itemTitle(it)"
-                    />
-                  </ng-container>
-                </div>
-              </div>
-            </div>
-
-            <div style="opacity:.9; text-align:right">
-              Gold: {{ p.goldEarned }} | Dmg: {{ p.totalDamageDealtToChampions }}
-            </div>
-          </div>
-        </div>
-
-        <details style="margin-top:12px">
-          <summary>Debug JSON</summary>
-          <pre>{{ d | json }}</pre>
-        </details>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule, FilterPipe],
+  templateUrl: './match.html',
+  styleUrls: ['./match.css'],
 })
 export class MatchComponent {
   private route = inject(ActivatedRoute);
@@ -400,6 +84,7 @@ export class MatchComponent {
   // ✅ timeline feed
   killFeed = signal<KillEventVM[]>([]);
   objectiveFeed = signal<ObjectiveEventVM[]>([]);
+  timelineExpanded = signal<boolean>(false);
 
   ngOnInit() {
     // preload DataDragon
@@ -437,6 +122,10 @@ export class MatchComponent {
 
   home() {
     this.router.navigate(['/']);
+  }
+
+  toggleTimeline() {
+    this.timelineExpanded.set(!this.timelineExpanded());
   }
 
   private ddVer(): string {

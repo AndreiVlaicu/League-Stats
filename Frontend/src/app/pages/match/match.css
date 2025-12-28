@@ -1,0 +1,422 @@
+.match-container {
+  min-height: 100vh;
+  background: #1a1a1a;
+  padding: 20px;
+}
+
+.match-card {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #2a2a2a;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 24px;
+}
+
+.nav-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #3f3f3f;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn:hover {
+  background: #525252;
+}
+
+h2,
+h3 {
+  color: #4ade80;
+  margin: 0 0 16px 0;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 18px;
+}
+
+h4 {
+  color: #e5e5e5;
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.message {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.loading {
+  background: #1f2937;
+  color: #4ade80;
+}
+
+.error {
+  background: #3f1f1f;
+  color: #fca5a5;
+  font-size: 13px;
+}
+
+.match-info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  color: #9ca3af;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #1f1f1f;
+  border-radius: 6px;
+}
+
+.match-info b,
+.team-stats b,
+.team-objectives b,
+.player-stats b {
+  color: #e5e5e5;
+}
+
+.section {
+  margin: 24px 0;
+}
+
+/* Cards */
+.team-card,
+.player-highlight,
+.timeline-section,
+.participant-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.participant-card {
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.participant-card.highlighted {
+  background: #1f2f1f;
+  border-color: #4ade80;
+}
+
+/* Teams */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.team-name {
+  font-weight: 600;
+  color: #e5e5e5;
+  font-size: 16px;
+}
+
+.team-result {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.team-result.win,
+.column-title.win,
+.player-champ .win {
+  color: #22c55e;
+}
+
+.team-result.loss,
+.column-title.loss,
+.player-champ .loss {
+  color: #ef4444;
+}
+
+.team-stats,
+.team-objectives,
+.player-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.team-stats {
+  margin-bottom: 10px;
+}
+
+.team-objectives {
+  gap: 12px;
+  font-size: 13px;
+}
+
+/* Player Highlight */
+.player-content,
+.participant-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.participant-content {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.participant-main {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.player-info,
+.participant-info {
+  flex: 1;
+}
+
+.participant-info {
+  min-width: 240px;
+}
+
+.player-champ,
+.participant-name {
+  font-weight: 600;
+  color: #e5e5e5;
+  margin-bottom: 6px;
+}
+
+.player-champ {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.participant-name {
+  font-size: 15px;
+}
+
+.participant-champ {
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+.player-stats {
+  margin-bottom: 10px;
+}
+
+.participant-stats {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.participant-extra {
+  text-align: right;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.participant-extra div {
+  margin: 4px 0;
+}
+
+/* Icons */
+.champ-icon-lg {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  border: 1px solid #3f3f3f;
+}
+
+.champ-icon-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid #3f3f3f;
+}
+
+.items-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.item-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #3f3f3f;
+}
+
+.event-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1px solid #3f3f3f;
+}
+
+/* Timeline */
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  padding: 8px 12px;
+  background: #1f1f1f;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.timeline-header:hover {
+  background: #252525;
+}
+
+.timeline-header h3 {
+  margin: 0;
+}
+
+.toggle-icon {
+  color: #4ade80;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 2000px;
+  opacity: 1;
+  overflow: hidden;
+}
+
+.timeline-grid.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+}
+
+.empty-message {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.timeline-event {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.timeline-event:last-child {
+  border-bottom: none;
+}
+
+.event-time {
+  width: 44px;
+  font-weight: 700;
+  color: #4ade80;
+  flex-shrink: 0;
+}
+
+.event-content {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.event-player,
+.event-objective {
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.event-action,
+.event-killer {
+  color: #6b7280;
+}
+
+.event-assists {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* Participants */
+.participants-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.participants-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.column-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0 0 8px 0;
+  padding: 8px 12px;
+  background: #1f1f1f;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.column-title.win {
+  border: 1px solid #22c55e;
+}
+
+.column-title.loss {
+  border: 1px solid #ef4444;
+}
+
+@media (max-width: 768px) {
+  .match-card {
+    padding: 16px;
+  }
+
+  .teams-grid,
+  .timeline-grid,
+  .participants-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .participant-content {
+    flex-direction: column;
+  }
+
+  .participant-extra {
+    text-align: left;
+  }
+}

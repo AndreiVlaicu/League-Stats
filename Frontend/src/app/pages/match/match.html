@@ -1,1 +1,328 @@
-<p>match works!</p>
+<div class="match-container">
+  <div class="match-card">
+    <div class="nav-bar">
+      <button (click)="back()" class="btn btn-secondary">Back</button>
+      <button (click)="home()" class="btn btn-secondary">Home</button>
+    </div>
+
+    <h2>Match Details</h2>
+
+    <div *ngIf="loading()" class="message loading">Loading...</div>
+    <div *ngIf="error()" class="message error">{{ error() }}</div>
+
+    <div *ngIf="data() as d">
+      <div class="match-info">
+        <span><b>Queue:</b> {{ queueName(d.match?.info?.queueId) }}</span>
+        <span
+          ><b>Duration:</b> {{ (d.match?.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }}
+          min</span
+        >
+      </div>
+
+      <!-- Team Summary -->
+      <div *ngIf="teams() as tmap" class="section">
+        <h3>Team Summary</h3>
+
+        <div class="teams-grid">
+          <!-- BLUE -->
+          <div class="team-card blue">
+            <div class="team-header">
+              <span class="team-name">Blue (100)</span>
+              <span class="team-result" [class.win]="tmap[100]?.win" [class.loss]="!tmap[100]?.win"
+                >{{ tmap[100]?.win ? 'WIN' : 'LOSS' }}</span
+              >
+            </div>
+
+            <div class="team-stats">
+              <div><b>Kills:</b> {{ teamAgg()[100]?.kills ?? 0 }}</div>
+              <div><b>Gold:</b> {{ teamAgg()[100]?.gold ?? 0 }}</div>
+              <div><b>Dmg:</b> {{ teamAgg()[100]?.dmg ?? 0 }}</div>
+            </div>
+
+            <div class="team-objectives">
+              <span><b>Towers:</b> {{ tmap[100]?.objectives?.tower?.kills ?? 0 }}</span>
+              <span><b>Dragons:</b> {{ tmap[100]?.objectives?.dragon?.kills ?? 0 }}</span>
+              <span><b>Baron:</b> {{ tmap[100]?.objectives?.baron?.kills ?? 0 }}</span>
+              <span><b>Herald:</b> {{ tmap[100]?.objectives?.riftHerald?.kills ?? 0 }}</span>
+            </div>
+          </div>
+
+          <!-- RED -->
+          <div class="team-card red">
+            <div class="team-header">
+              <span class="team-name">Red (200)</span>
+              <span class="team-result" [class.win]="tmap[200]?.win" [class.loss]="!tmap[200]?.win"
+                >{{ tmap[200]?.win ? 'WIN' : 'LOSS' }}</span
+              >
+            </div>
+
+            <div class="team-stats">
+              <div><b>Kills:</b> {{ teamAgg()[200]?.kills ?? 0 }}</div>
+              <div><b>Gold:</b> {{ teamAgg()[200]?.gold ?? 0 }}</div>
+              <div><b>Dmg:</b> {{ teamAgg()[200]?.dmg ?? 0 }}</div>
+            </div>
+
+            <div class="team-objectives">
+              <span><b>Towers:</b> {{ tmap[200]?.objectives?.tower?.kills ?? 0 }}</span>
+              <span><b>Dragons:</b> {{ tmap[200]?.objectives?.dragon?.kills ?? 0 }}</span>
+              <span><b>Baron:</b> {{ tmap[200]?.objectives?.baron?.kills ?? 0 }}</span>
+              <span><b>Herald:</b> {{ tmap[200]?.objectives?.riftHerald?.kills ?? 0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Highlight -->
+      <div *ngIf="player() as p" class="section">
+        <h3>Your Performance</h3>
+        <div class="player-highlight">
+          <div class="player-content">
+            <img
+              *ngIf="champIconUrl(p.championId) as cicon"
+              [src]="cicon"
+              class="champ-icon-lg"
+            />
+
+            <div class="player-info">
+              <div class="player-champ">
+                {{ champName(p.championId) || 'Champion #' + p.championId }}
+                <span [class]="p.win ? 'win' : 'loss'">{{ p.win ? 'WIN' : 'LOSS' }}</span>
+              </div>
+
+              <div class="player-stats">
+                <span><b>KDA:</b> {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
+                <span><b>CS:</b> {{ cs(p) }}</span>
+                <span><b>Vision:</b> {{ p.visionScore ?? 0 }}</span>
+              </div>
+
+              <div class="items-row">
+                <img
+                  *ngIf="spellIconUrl(p.summoner1Id) as s1"
+                  [src]="s1"
+                  class="item-icon"
+                  [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
+                />
+
+                <img
+                  *ngIf="spellIconUrl(p.summoner2Id) as s2"
+                  [src]="s2"
+                  class="item-icon"
+                  [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
+                />
+
+                <ng-container *ngFor="let it of itemIds(p)">
+                  <img
+                    *ngIf="itemIconUrl(it) as iu"
+                    [src]="iu"
+                    class="item-icon"
+                    [title]="itemTitle(it)"
+                  />
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Participants -->
+      <div class="section">
+        <h3>Participants</h3>
+
+        <div class="participants-grid">
+          <!-- Winners -->
+          <div class="participants-column">
+            <h4 class="column-title win">Winners</h4>
+            <div
+              *ngFor="let p of d.match?.info?.participants | filter: 'win':true"
+              class="participant-card"
+              [class.highlighted]="p.puuid === puuid()"
+            >
+              <div class="participant-content">
+                <div class="participant-main">
+                  <img
+                    *ngIf="champIconUrl(p.championId) as cicon"
+                    [src]="cicon"
+                    class="champ-icon-sm"
+                  />
+
+                  <div class="participant-info">
+                    <div class="participant-name">
+                      {{ p.riotIdGameName || p.summonerName || 'Player' }}
+                      <span class="participant-champ">
+                        — {{ champName(p.championId) || '#' + p.championId }}
+                      </span>
+                    </div>
+
+                    <div class="participant-stats">
+                      KDA {{ p.kills }}/{{ p.deaths }}/{{ p.assists }} | CS {{ cs(p) }} | Vision
+                      {{ p.visionScore ?? 0 }}
+                    </div>
+
+                    <div class="items-row">
+                      <img
+                        *ngIf="spellIconUrl(p.summoner1Id) as s1"
+                        [src]="s1"
+                        class="item-icon-sm"
+                        [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
+                      />
+                      <img
+                        *ngIf="spellIconUrl(p.summoner2Id) as s2"
+                        [src]="s2"
+                        class="item-icon-sm"
+                        [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
+                      />
+
+                      <ng-container *ngFor="let it of itemIds(p)">
+                        <img
+                          *ngIf="itemIconUrl(it) as iu"
+                          [src]="iu"
+                          class="item-icon-sm"
+                          [title]="itemTitle(it)"
+                        />
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="participant-extra">
+                  <div>Gold: {{ p.goldEarned }}</div>
+                  <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Losers -->
+          <div class="participants-column">
+            <h4 class="column-title loss">Losers</h4>
+            <div
+              *ngFor="let p of d.match?.info?.participants | filter: 'win':false"
+              class="participant-card"
+              [class.highlighted]="p.puuid === puuid()"
+            >
+              <div class="participant-content">
+                <div class="participant-main">
+                  <img
+                    *ngIf="champIconUrl(p.championId) as cicon"
+                    [src]="cicon"
+                    class="champ-icon-sm"
+                  />
+
+                  <div class="participant-info">
+                    <div class="participant-name">
+                      {{ p.riotIdGameName || p.summonerName || 'Player' }}
+                      <span class="participant-champ">
+                        — {{ champName(p.championId) || '#' + p.championId }}
+                      </span>
+                    </div>
+
+                    <div class="participant-stats">
+                      KDA {{ p.kills }}/{{ p.deaths }}/{{ p.assists }} | CS {{ cs(p) }} | Vision
+                      {{ p.visionScore ?? 0 }}
+                    </div>
+
+                    <div class="items-row">
+                      <img
+                        *ngIf="spellIconUrl(p.summoner1Id) as s1"
+                        [src]="s1"
+                        class="item-icon-sm"
+                        [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
+                      />
+                      <img
+                        *ngIf="spellIconUrl(p.summoner2Id) as s2"
+                        [src]="s2"
+                        class="item-icon-sm"
+                        [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
+                      />
+
+                      <ng-container *ngFor="let it of itemIds(p)">
+                        <img
+                          *ngIf="itemIconUrl(it) as iu"
+                          [src]="iu"
+                          class="item-icon-sm"
+                          [title]="itemTitle(it)"
+                        />
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="participant-extra">
+                  <div>Gold: {{ p.goldEarned }}</div>
+                  <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div
+        *ngIf="killFeed().length || objectiveFeed().length"
+        class="section"
+      >
+        <div class="timeline-header" (click)="toggleTimeline()">
+          <h3>Timeline</h3>
+          <span class="toggle-icon">{{ timelineExpanded() ? '▼' : '▶' }}</span>
+        </div>
+
+        <div class="timeline-grid" [class.collapsed]="!timelineExpanded()">
+          <!-- Kill Feed -->
+          <div class="timeline-section">
+            <h4>Kill Feed</h4>
+
+            <div *ngIf="!killFeed().length" class="empty-message">No kill events.</div>
+
+            <div *ngFor="let e of killFeed()" class="timeline-event">
+              <div class="event-time">{{ e.minute }}'</div>
+
+              <div class="event-content">
+                <img
+                  *ngIf="e.killer?.championId && champIconUrl(e.killer?.championId) as kc"
+                  [src]="kc"
+                  class="event-icon"
+                  [title]="playerName(e.killer)"
+                />
+                <span class="event-player">{{ playerName(e.killer) }}</span>
+
+                <span class="event-action">killed</span>
+
+                <img
+                  *ngIf="e.victim?.championId && champIconUrl(e.victim?.championId) as vc"
+                  [src]="vc"
+                  class="event-icon"
+                  [title]="playerName(e.victim)"
+                />
+                <span class="event-player">{{ playerName(e.victim) }}</span>
+
+                <span *ngIf="e.assists?.length" class="event-assists">
+                  (assists:
+                  <ng-container *ngFor="let a of e.assists; let last = last">
+                    {{ playerName(a) }}<span *ngIf="!last">, </span>
+                  </ng-container>
+                  )
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objectives -->
+          <div class="timeline-section">
+            <h4>Objectives</h4>
+
+            <div *ngIf="!objectiveFeed().length" class="empty-message">No objective events.</div>
+
+            <div *ngFor="let o of objectiveFeed()" class="timeline-event">
+              <div class="event-time">{{ o.minute }}'</div>
+              <div class="event-content">
+                <span class="event-objective">{{ o.text }}</span>
+                <span *ngIf="o.killer" class="event-killer"> — by {{ playerName(o.killer) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
