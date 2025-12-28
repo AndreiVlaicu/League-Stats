@@ -65,8 +65,8 @@ export class MatchComponent {
 
   routing = signal<string>('europe');
   matchId = signal<string>('');
-  puuuid = signal<string>(''); // păstrăm ce aveai (nu folosim)
-  puuid = signal<string>(''); // folosim
+  puuid = signal<string>('');
+  region = signal<string>('EUW');
   ddVersion = signal<string>('');
 
   championsByKey = signal<Record<string, ChampionData>>({});
@@ -110,8 +110,27 @@ export class MatchComponent {
 
     this.route.paramMap.subscribe((pm) => {
       this.routing.set(pm.get('routing') ?? 'europe');
-      this.matchId.set(pm.get('matchId') ?? '');
+      const matchId = pm.get('matchId') ?? '';
+      this.matchId.set(matchId);
       this.puuid.set(pm.get('puuid') ?? '');
+      
+      const prefix = matchId.split('_')[0].toUpperCase();
+      const regionMap: Record<string, string> = {
+        'EUW1': 'EUW',
+        'EUN1': 'EUNE',
+        'NA1': 'NA',
+        'KR': 'KR',
+        'BR1': 'BR',
+        'JP1': 'JP',
+        'OC1': 'OCE',
+        'TR1': 'TR',
+        'RU': 'RU',
+        'LA1': 'LAN',
+        'LA2': 'LAS',
+      };
+      
+      this.region.set(regionMap[prefix] || 'EUW');
+      
       this.load();
     });
   }
@@ -126,6 +145,17 @@ export class MatchComponent {
 
   toggleTimeline() {
     this.timelineExpanded.set(!this.timelineExpanded());
+  }
+
+  openParticipantProfile(participant: any) {
+    const gameName = participant.riotIdGameName || participant.summonerName;
+    const tagLine = participant.riotIdTagLine;
+    
+    if (gameName && tagLine) {
+      this.router.navigate(['/summoner', this.region(), gameName, tagLine]);
+    } else if (participant.puuid) {
+      this.router.navigate(['/summoner-puuid', this.region(), participant.puuid]);
+    }
   }
 
   private ddVer(): string {
@@ -189,6 +219,16 @@ export class MatchComponent {
   playerName(p: any | null): string {
     if (!p) return 'Unknown';
     return p?.riotIdGameName || p?.summonerName || 'Player';
+  }
+
+  getPlayerDisplayName(p: any): string {
+    const gameName = p?.riotIdGameName || p?.summonerName || 'Player';
+    const tagLine = p?.riotIdTagLine;
+    
+    if (gameName && tagLine) {
+      return `${gameName}#${tagLine}`;
+    }
+    return gameName;
   }
 
   private toMinute(ts?: number): number {

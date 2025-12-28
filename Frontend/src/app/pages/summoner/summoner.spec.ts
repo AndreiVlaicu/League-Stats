@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Summoner } from './summoner';
+import { SummonerComponent } from './summoner';
 
 describe('Summoner', () => {
-  let component: Summoner;
-  let fixture: ComponentFixture<Summoner>;
+  let component: SummonerComponent;
+  let fixture: ComponentFixture<SummonerComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Summoner]
+      imports: [SummonerComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(Summoner);
+    fixture = TestBed.createComponent(SummonerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

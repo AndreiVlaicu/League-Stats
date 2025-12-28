@@ -146,8 +146,8 @@
                   />
 
                   <div class="participant-info">
-                    <div class="participant-name">
-                      {{ p.riotIdGameName || p.summonerName || 'Player' }}
+                    <div class="participant-name" (click)="openParticipantProfile(p)" style="cursor: pointer;">
+                      {{ getPlayerDisplayName(p) }}
                       <span class="participant-champ">
                         — {{ champName(p.championId) || '#' + p.championId }}
                       </span>
@@ -209,8 +209,8 @@
                   />
 
                   <div class="participant-info">
-                    <div class="participant-name">
-                      {{ p.riotIdGameName || p.summonerName || 'Player' }}
+                    <div class="participant-name" (click)="openParticipantProfile(p)" style="cursor: pointer;">
+                      {{ getPlayerDisplayName(p) }}
                       <span class="participant-champ">
                         — {{ champName(p.championId) || '#' + p.championId }}
                       </span>

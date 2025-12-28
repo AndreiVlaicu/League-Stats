@@ -217,6 +217,18 @@ h4 {
   font-size: 15px;
 }
 
+.participant-name {
+  font-weight: 600;
+  color: #e5e5e5;
+  margin-bottom: 6px;
+  font-size: 15px;
+  transition: color 0.2s ease;
+}
+
+.participant-name:hover {
+  color: #4ade80;
+}
+
 .participant-champ {
   font-weight: 400;
   color: #9ca3af;
