@@ -5,6 +5,14 @@
         <option>EUW</option>
         <option>EUNE</option>
         <option>NA</option>
+        <option>KR</option>
+        <option>BR</option>
+        <option>JP</option>
+        <option>OCE</option>
+        <option>TR</option>
+        <option>RU</option>
+        <option>LAN</option>
+        <option>LAS</option>
       </select>
 
       <input
@@ -73,7 +81,7 @@
       </div>
       } @else {
       <div class="current-game not-in-game">
-        <h3>⏸ Not in game</h3>
+        <button (click)="checkLiveGame()" class="btn btn-primary">Check Live Match</button>
       </div>
       }
 

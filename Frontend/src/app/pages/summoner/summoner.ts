@@ -151,6 +151,26 @@ export class SummonerComponent {
     this.router.navigate(['/live', platform, summonerId]);
   }
 
+  checkLiveGame() {
+    const b = this.bundle();
+    if (!b?.summoner?.puuid || !b?.platform) return;
+
+    this.riot.getCurrentGameByPuuid(b.platform, b.summoner.puuid).pipe(
+      catchError((err) => {
+        if (err?.status === 404) {
+          return of(null);
+        }
+        return throwError(() => err);
+      })
+    ).subscribe({
+      next: (currentGame) => {
+        if (currentGame) {
+          this.bundle.set({ ...b, currentGame });
+        }
+      }
+    });
+  }
+
   openMatch(arg1: any, arg2?: any) {
     const routing = REGION_TO_ROUTING[this.region];
 
@@ -285,21 +305,12 @@ export class SummonerComponent {
           forkJoin({
             rank: summoner?.id ? this.riot.getRankBySummonerId(platform, summoner.id) : of([]),
 
-            currentGame: summoner?.id
-              ? this.riot.getCurrentGame(platform, summoner.id).pipe(
-                  catchError((err) => {
-                    if (err?.status === 404) return of(null);
-                    return throwError(() => err);
-                  })
-                )
-              : of(null),
-
             masteries: summoner?.id
               ? this.riot.getChampionMasteries(platform, summoner.id).pipe(catchError(() => of([])))
               : of([]),
 
             matchIds: this.riot.matchIdsByPuuid(routing, account.puuid, 0, 20),
-          }).pipe(map((extra) => ({ account, summoner, platform, ...extra })))
+          }).pipe(map((extra) => ({ account, summoner, platform, ...extra, currentGame: null })))
         ),
 
         switchMap((base2) => {

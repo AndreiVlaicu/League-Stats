@@ -118,6 +118,14 @@ export class RiotApiService {
     );
   }
 
+  getCurrentGameByPuuid(platform: string, puuid: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.BASE}/${platform}/lol/spectator/v5/active-games/by-summoner/${encodeURIComponent(
+        puuid
+      )}`
+    );
+  }
+
   // ---------- Champion Mastery-V4 (platform) ----------
   getChampionMasteries(platform: string, summonerId: string): Observable<any[]> {
     return this.http.get<any[]>(
