@@ -116,11 +116,27 @@
       }
 
 
-      @if (matches().length) {
-      <div class="section">
-        <h3>Match History ({{ matches().length }})</h3>
 
-        @for (m of matches(); track m.metadata.matchId) {
+      @if (matches().length) {
+      <div class="match-filter-bar">
+        <label class="match-filter-label">Match Type:</label>
+
+        <select class="match-type-select" [ngModel]="matchType()" (ngModelChange)="matchType.set($event)">
+          <option value="ALL">All</option>
+          <option value="RANKED">Ranked</option>
+          <option value="NORMAL">Normal</option>
+          <option value="ARAM">ARAM</option>
+          <option value="URF">URF</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      }
+
+
+      @if (filteredMatches.length) {
+      <div class="section">
+        <h3>Match History ({{ filteredMatches.length }})</h3>
+        @for (m of filteredMatches; track m.metadata.matchId) {
         <div class="match-card">
           <div class="match-header">
             <div><b>{{ queueName(m.info?.queueId) }}</b></div>
@@ -156,7 +172,7 @@
                   } @if (spellIconUrl(p.summoner2Id); as s2) {
                   <img [src]="s2" width="26" height="26" class="item-icon"
                     [title]="spellTitle(p.summoner2Id) || 'Spell 2'" />
-                  } @for (it of itemIds(p); track idx; let idx = $index) { @if (itemIconUrl(it); as iu) {
+                  } @for (it of itemIds(p); let idx = $index; track idx) { @if (itemIconUrl(it); as iu) {
                   <img [src]="iu" width="26" height="26" class="item-icon" [title]="itemTitle(it)" />
                   } }
                 </div>

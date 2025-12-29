@@ -24,6 +24,23 @@ import { LiveGameComponent } from '../live-game/live-game';
   styleUrls: ['./summoner.css'],
 })
 export class SummonerComponent {
+  // FILTRARE TIP MECI
+  matchType = signal<'ALL' | 'RANKED' | 'NORMAL' | 'ARAM' | 'URF' | 'OTHER'>('ALL');
+
+  getMatchType(queueId?: number): 'RANKED' | 'NORMAL' | 'ARAM' | 'URF' | 'OTHER' {
+    if (!queueId) return 'OTHER';
+    if (queueId === 420 || queueId === 440) return 'RANKED';
+    if (queueId === 400 || queueId === 430) return 'NORMAL';
+    if (queueId === 450) return 'ARAM';
+    if (queueId === 900) return 'URF';
+    return 'OTHER';
+  }
+
+  get filteredMatches() {
+    const type = this.matchType();
+    if (type === 'ALL') return this.matches();
+    return this.matches().filter(m => this.getMatchType(m?.info?.queueId) === type);
+  }
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private riot = inject(RiotApiService);
