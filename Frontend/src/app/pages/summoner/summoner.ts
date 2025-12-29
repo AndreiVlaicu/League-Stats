@@ -12,7 +12,7 @@ import {
   ChampionData,
   SummonerSpellData,
   ItemData,
-} from '../../core/services/champion.service'; 
+} from '../../core/services/champion.service';
 import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '../../core/regions';
 import { LiveGameComponent } from '../live-game/live-game';
 
@@ -51,12 +51,62 @@ export class SummonerComponent {
     { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
   ];
 
+  // PAGINARE MATCH-URI
+  pageSize = 5;
+  currentStart = 0;
+  matches = signal<any[]>([]);
+  isLoadingMore = signal(false);
+  hasMoreMatches = signal(true);
+
   uniqueGameNames(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.gameName))).sort();
   }
   uniqueTagLines(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.tagLine))).sort();
   }
+
+  loadMoreMatches() {
+    if (this.isLoadingMore() || !this.hasMoreMatches()) return;
+
+    const b = this.bundle();
+    if (!b?.account?.puuid) return;
+
+    this.isLoadingMore.set(true);
+
+    const routing = REGION_TO_ROUTING[this.region];
+    const puuid = b.account.puuid;
+
+    this.riot.matchIdsByPuuid(routing, puuid, this.currentStart, this.pageSize)
+      .subscribe(ids => {
+        if (!ids.length) {
+          this.hasMoreMatches.set(false);
+          this.isLoadingMore.set(false);
+          return;
+        }
+
+        this.currentStart += ids.length;
+
+        let loaded = 0;
+        ids.forEach(id => {
+          this.riot.matchById(routing, id).subscribe({
+            next: match => {
+              this.matches.update(arr => [...arr, match]);
+            },
+            complete: () => {
+              loaded++;
+              if (loaded === ids.length) {
+                if (ids.length < this.pageSize) {
+                  this.hasMoreMatches.set(false);
+                }
+                this.isLoadingMore.set(false);
+              }
+            }
+          });
+        });
+      });
+  }
+
+
 
   applyPlayerInput(value?: string) {
     const raw = (value ?? this.playerInput ?? '').trim();
@@ -319,20 +369,20 @@ export class SummonerComponent {
 
             matchIds: this.riot.matchIdsByPuuid(routing, account.puuid, 0, 20),
           }).pipe(map((extra) => ({ account, summoner, platform, ...extra, currentGame: null })))
-        ),
-
-        switchMap((base2) => {
-          const ids = (base2.matchIds ?? []).slice(0, 5);
-          if (ids.length === 0) return of({ ...base2, matches: [] });
-
-          return forkJoin(ids.map((id: string) => this.riot.matchById(routing, id))).pipe(
-            map((matches) => ({ ...base2, matches }))
-          );
-        })
+        )
       )
       .subscribe({
         next: (res) => {
           this.bundle.set(res);
+
+          // RESET PAGINARE
+          this.matches.set([]);
+          this.currentStart = 0;
+          this.hasMoreMatches.set(true);
+
+          // ÎNCARCĂ PRIMELE 5
+          this.loadMoreMatches();
+
           this.loading.set(false);
         },
         error: (err) => {

@@ -15,13 +15,8 @@
         <option>LAS</option>
       </select>
 
-      <input
-        [(ngModel)]="playerInput"
-        list="playerList"
-        placeholder="gameName#tagLine (e.g., Caps#G2)"
-        class="input flex-1"
-        (ngModelChange)="applyPlayerInput($event)"
-      />
+      <input [(ngModel)]="playerInput" list="playerList" placeholder="gameName#tagLine (e.g., Caps#G2)"
+        class="input flex-1" (ngModelChange)="applyPlayerInput($event)" />
 
       <datalist id="playerList">
         @for (p of presets; track p.label) {
@@ -71,10 +66,7 @@
 
       @if (b.currentGame) {
       <div class="current-game in-game">
-        <app-live-game 
-          [embedded]="true" 
-          [gameData]="b.currentGame" 
-          [platformInput]="b.platform">
+        <app-live-game [embedded]="true" [gameData]="b.currentGame" [platformInput]="b.platform">
         </app-live-game>
       </div>
       } @else {
@@ -106,13 +98,8 @@
           <div class="mastery-card">
             <div class="mastery-content">
               @if (masteryChampIconUrl(m.championId); as ic) {
-              <img
-                [src]="ic"
-                width="40"
-                height="40"
-                class="champ-icon"
-                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId"
-              />
+              <img [src]="ic" width="40" height="40" class="champ-icon"
+                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
               }
               <div>
                 <div class="champ-name">
@@ -128,15 +115,12 @@
       </div>
       }
 
-      @if (b.matchIds?.length === 0) {
-      <div class="message warning">No matches found for this account.</div>
-      }
 
-      @if (b.matches?.length) {
+      @if (matches().length) {
       <div class="section">
-        <h3>Match History ({{ b.matches.length }})</h3>
+        <h3>Match History ({{ matches().length }})</h3>
 
-        @for (m of b.matches; track m) {
+        @for (m of matches(); track m.metadata.matchId) {
         <div class="match-card">
           <div class="match-header">
             <div><b>{{ queueName(m.info?.queueId) }}</b></div>
@@ -145,21 +129,16 @@
 
           <div class="match-id">{{ m.metadata?.matchId }}</div>
 
-          <button (click)="openMatch(m.metadata?.matchId, b.account.puuid)" class="btn btn-primary">
+          <button (click)="openMatch(m.metadata?.matchId, bundle().account.puuid)" class="btn btn-primary">
             Details
           </button>
 
-          @if (playerInMatch(m, b.account.puuid); as p) {
+          @if (playerInMatch(m, bundle().account.puuid); as p) {
           <div class="player-summary">
             <div class="player-content">
               @if (champIconUrl(p.championId); as cicon) {
-              <img
-                [src]="cicon"
-                width="52"
-                height="52"
-                class="champ-icon-lg"
-                [title]="champName(p.championId) || 'Champion #' + p.championId"
-              />
+              <img [src]="cicon" width="52" height="52" class="champ-icon-lg"
+                [title]="champName(p.championId) || 'Champion #' + p.championId" />
               }
 
               <div class="player-info">
@@ -172,22 +151,12 @@
 
                 <div class="items-row">
                   @if (spellIconUrl(p.summoner1Id); as s1) {
-                  <img
-                    [src]="s1"
-                    width="26"
-                    height="26"
-                    class="item-icon"
-                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
-                  />
+                  <img [src]="s1" width="26" height="26" class="item-icon"
+                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'" />
                   } @if (spellIconUrl(p.summoner2Id); as s2) {
-                  <img
-                    [src]="s2"
-                    width="26"
-                    height="26"
-                    class="item-icon"
-                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
-                  />
-                  } @for (it of itemIds(p); track it) { @if (itemIconUrl(it); as iu) {
+                  <img [src]="s2" width="26" height="26" class="item-icon"
+                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'" />
+                  } @for (it of itemIds(p); track idx; let idx = $index) { @if (itemIconUrl(it); as iu) {
                   <img [src]="iu" width="26" height="26" class="item-icon" [title]="itemTitle(it)" />
                   } }
                 </div>
@@ -197,6 +166,17 @@
           } @else {
           <div class="player-not-found">Player not found in this match.</div>
           }
+        </div>
+        }
+
+        @if (hasMoreMatches()) {
+        <div class="load-more">
+          <button class="btn btn-primary load-more-btn" (click)="loadMoreMatches()" [disabled]="isLoadingMore()">
+            <span *ngIf="isLoadingMore(); else loadText">
+              <span class="spinner"></span> Loading...
+            </span>
+            <ng-template #loadText>Load more matches</ng-template>
+          </button>
         </div>
         }
       </div>
