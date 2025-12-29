@@ -155,6 +155,8 @@ export class SummonerComponent {
     const b = this.bundle();
     if (!b?.summoner?.puuid || !b?.platform) return;
 
+    this.error.set(null);
+
     this.riot.getCurrentGameByPuuid(b.platform, b.summoner.puuid).pipe(
       catchError((err) => {
         if (err?.status === 404) {
@@ -166,7 +168,12 @@ export class SummonerComponent {
       next: (currentGame) => {
         if (currentGame) {
           this.bundle.set({ ...b, currentGame });
+        } else {
+          this.error.set('The user is not in a game.');
         }
+      },
+      error: (err) => {
+        this.error.set('Error checking live game.');
       }
     });
   }
