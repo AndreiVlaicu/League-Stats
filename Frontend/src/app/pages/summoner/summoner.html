@@ -71,13 +71,11 @@
 
       @if (b.currentGame) {
       <div class="current-game in-game">
-        <h3>✅ Currently In Game</h3>
-        <div><b>GameId:</b> {{ b.currentGame.gameId }}</div>
-        <div><b>Queue:</b> {{ queueName(b.currentGame.gameQueueConfigId) }}</div>
-        <div><b>Started:</b> {{ b.currentGame.gameStartTime }}</div>
-        <button (click)="openLive(b.platform, b.summoner.id)" class="btn btn-primary">
-          Live Details
-        </button>
+        <app-live-game 
+          [embedded]="true" 
+          [gameData]="b.currentGame" 
+          [platformInput]="b.platform">
+        </app-live-game>
       </div>
       } @else {
       <div class="current-game not-in-game">

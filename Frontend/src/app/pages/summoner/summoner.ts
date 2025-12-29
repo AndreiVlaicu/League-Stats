@@ -14,11 +14,12 @@ import {
   ItemData,
 } from '../../core/services/champion.service'; 
 import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING, QUEUE_NAMES } from '../../core/regions';
+import { LiveGameComponent } from '../live-game/live-game';
 
 @Component({
   standalone: true,
   selector: 'app-summoner',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, LiveGameComponent],
   templateUrl: './summoner.html',
   styleUrls: ['./summoner.css'],
 })

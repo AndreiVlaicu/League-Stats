@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
@@ -19,186 +19,14 @@ type TeamId = 100 | 200;
   standalone: true,
   selector: 'app-live-game',
   imports: [CommonModule],
-  template: `
-    <div style="padding:16px">
-      <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
-        <button (click)="back()">Înapoi</button>
-        <button (click)="home()">Home</button>
-      </div>
-
-      <h2>Live Game</h2>
-
-      @if (loading()) {
-      <p>Loading...</p>
-      } @if (error()) {
-      <p>{{ error() }}</p>
-      } @if (!loading() && !error() && !game()) {
-      <div style="border:1px solid #eee; padding:10px; border-radius:10px; opacity:.9;">
-        <b>Nu este în joc</b> (sau s-a terminat între timp).
-      </div>
-      } @if (game(); as g) {
-      <p>
-        <b>Platform:</b> {{ platform() }}
-        &nbsp;|&nbsp;
-        <b>Queue:</b> {{ queueName(g.gameQueueConfigId) }}
-        &nbsp;|&nbsp;
-        <b>GameId:</b> {{ g.gameId }}
-        &nbsp;|&nbsp;
-        <b>Started:</b> {{ g.gameStartTime }}
-        &nbsp;|&nbsp;
-        <b>DDragon:</b> {{ ddVersion() || '...' }}
-      </p>
-
-      <!-- Bans (dacă există) -->
-      @if (g.bannedChampions?.length) {
-      <div style="border:1px solid #eee; padding:10px; border-radius:10px; margin:10px 0;">
-        <b>Bans:</b>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;">
-          @for (bc of g.bannedChampions; track bc) { @if (champIconUrl(bc.championId); as ic) {
-          <img
-            [src]="ic"
-            width="26"
-            height="26"
-            style="border-radius:6px; border:1px solid #ddd"
-            [title]="champName(bc.championId) || '#' + bc.championId"
-          />
-          } }
-        </div>
-      </div>
-      }
-
-      <!-- Teams -->
-      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
-        <!-- BLUE -->
-        <div
-          style="flex:1; min-width:360px; border:1px solid #ddd; border-radius:12px; padding:10px;"
-        >
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Blue (100)</b>
-            <span style="opacity:.8">{{ team(100)?.length ?? 0 }} players</span>
-          </div>
-
-          @for (p of team(100); track p) {
-          <div style="border-top:1px solid #eee; padding-top:10px; margin-top:10px;">
-            <div style="display:flex; gap:10px; align-items:flex-start;">
-              @if (champIconUrl(p.championId); as cicon) {
-              <img
-                [src]="cicon"
-                width="34"
-                height="34"
-                style="border-radius:10px; border:1px solid #ddd"
-                [title]="champName(p.championId) || '#' + p.championId"
-              />
-              }
-
-              <div style="flex:1;">
-                <div style="font-weight:700">
-                  {{ p.riotId || p.summonerName || 'Player' }}
-                  <span style="font-weight:400; opacity:.8"
-                    >— {{ champName(p.championId) || '#' + p.championId }}</span
-                  >
-                </div>
-
-                <div
-                  style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
-                >
-                  @if (spellIconUrl(p.spell1Id); as s1) {
-                  <img
-                    [src]="s1"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.spell1Id) || 'Spell 1'"
-                  />
-                  } @if (spellIconUrl(p.spell2Id); as s2) {
-                  <img
-                    [src]="s2"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.spell2Id) || 'Spell 2'"
-                  />
-                  }
-                </div>
-                <button (click)="openByPuuid(p.puuid)" style="margin-top:6px">
-                  Deschide profil
-                </button>
-              </div>
-            </div>
-          </div>
-          }
-        </div>
-
-        <!-- RED -->
-        <div
-          style="flex:1; min-width:360px; border:1px solid #ddd; border-radius:12px; padding:10px;"
-        >
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <b>Red (200)</b>
-            <span style="opacity:.8">{{ team(200)?.length ?? 0 }} players</span>
-          </div>
-
-          @for (p of team(200); track p) {
-          <div style="border-top:1px solid #eee; padding-top:10px; margin-top:10px;">
-            <div style="display:flex; gap:10px; align-items:flex-start;">
-              @if (champIconUrl(p.championId); as cicon) {
-              <img
-                [src]="cicon"
-                width="34"
-                height="34"
-                style="border-radius:10px; border:1px solid #ddd"
-                [title]="champName(p.championId) || '#' + p.championId"
-              />
-              }
-
-              <div style="flex:1;">
-                <div style="font-weight:700">
-                  {{ p.riotId || p.summonerName || 'Player' }}
-                  <span style="font-weight:400; opacity:.8"
-                    >— {{ champName(p.championId) || '#' + p.championId }}</span
-                  >
-                </div>
-
-                <div
-                  style="display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px;"
-                >
-                  @if (spellIconUrl(p.spell1Id); as s1) {
-                  <img
-                    [src]="s1"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.spell1Id) || 'Spell 1'"
-                  />
-                  } @if (spellIconUrl(p.spell2Id); as s2) {
-                  <img
-                    [src]="s2"
-                    width="22"
-                    height="22"
-                    style="border-radius:6px; border:1px solid #ddd"
-                    [title]="spellTitle(p.spell2Id) || 'Spell 2'"
-                  />
-                  }
-                </div>
-                <button (click)="openByPuuid(p.puuid)" style="margin-top:6px">
-                  Deschide profil
-                </button>
-              </div>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-
-      <details style="margin-top:12px">
-        <summary>Debug JSON</summary>
-        <pre>{{ g | json }}</pre>
-      </details>
-      }
-    </div>
-  `,
+  templateUrl: './live-game.html',
+  styleUrls: ['./live-game.css'],
 })
-export class LiveGameComponent {
+export class LiveGameComponent implements OnChanges {
+  @Input() embedded = false;
+  @Input() gameData: any = null;
+  @Input() platformInput: string | null = null;
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
@@ -235,12 +63,35 @@ export class LiveGameComponent {
       error: () => this.spellsByKey.set({}),
     });
 
-    // params
-    this.route.paramMap.subscribe((pm) => {
-      this.platform.set(pm.get('platform') ?? 'euw1');
-      this.summonerId.set(pm.get('summonerId') ?? '');
-      this.load();
-    });
+    if (this.embedded) {
+      if (this.platformInput) {
+        this.platform.set(this.platformInput);
+      }
+      if (this.gameData) {
+        this.game.set(this.gameData);
+      }
+    } else {
+      // params
+      this.route.paramMap.subscribe((pm) => {
+        const p = pm.get('platform');
+        const s = pm.get('summonerId');
+        if (p) this.platform.set(p);
+        if (s) this.summonerId.set(s);
+        
+        if (p && s) {
+          this.load();
+        }
+      });
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['platformInput'] && this.platformInput) {
+      this.platform.set(this.platformInput);
+    }
+    if (changes['gameData'] && this.gameData) {
+      this.game.set(this.gameData);
+    }
   }
 
   back() {
