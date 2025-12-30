@@ -41,13 +41,46 @@
         </div>
       }
 
-      <div class="teams-grid">
-        <!-- Blue Team -->
-        <div class="team-card blue">
-          <div class="team-header">
-            <span>Blue Team</span>
+      @if (isArenaMode()) {
+        <!-- All Participants for Arena/Special modes -->
+        <div class="all-players">
+          <h3>All Participants ({{ allParticipants().length }})</h3>
+          <div class="participants-grid">
+            @for (p of allParticipants(); track p.puuid) {
+              <div class="participant-card">
+                <div class="spells-col">
+                  @if (spellIconUrl(p.spell1Id); as s1) {
+                    <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)">
+                  }
+                  @if (spellIconUrl(p.spell2Id); as s2) {
+                    <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
+                  }
+                </div>
+                
+                @if (champIconUrl(p.championId); as cicon) {
+                  <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
+                }
+
+                <div class="player-info">
+                  <div class="player-name" (click)="openByPuuid(p.puuid)">
+                    {{ p.riotId || p.summonerName }}
+                  </div>
+                  <div class="champ-name">
+                    {{ champName(p.championId) }}
+                  </div>
+                </div>
+              </div>
+            }
           </div>
-          @for (p of team(100); track p.summonerId) {
+        </div>
+      } @else {
+        <div class="teams-grid">
+          <!-- Blue Team -->
+          <div class="team-card blue">
+            <div class="team-header">
+              <span>Blue Team</span>
+            </div>
+            @for (p of team(100); track p.summonerId) {
             <div class="participant-row">
               <div class="spells-col">
                 @if (spellIconUrl(p.spell1Id); as s1) {
@@ -106,6 +139,7 @@
           }
         </div>
       </div>
+      }
     }
   </div>
 </div>

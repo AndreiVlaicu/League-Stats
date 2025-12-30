@@ -148,8 +148,18 @@ export class LiveGameComponent implements OnChanges {
     return this.champs.spellNameByNumericKeySync(spellKey ?? 0, this.spellsByKey());
   }
 
+  isArenaMode() {
+    const g = this.game();
+    return (g?.participants?.length === 16) || (g?.gameMode === 'CHERRY');
+  }
+
+  allParticipants() {
+    return this.game()?.participants ?? [];
+  }
+
   team(teamId: TeamId) {
-    return (this.game()?.participants ?? []).filter((p: any) => p?.teamId === teamId);
+    const participants = this.game()?.participants ?? [];
+    return participants.filter((p: any) => Number(p?.teamId) === Number(teamId));
   }
 
   private load() {

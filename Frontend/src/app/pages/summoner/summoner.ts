@@ -380,7 +380,9 @@ export class SummonerComponent {
 
         switchMap(({ account, summoner, platform }) =>
           forkJoin({
-            rank: summoner?.id ? this.riot.getRankBySummonerId(platform, summoner.id) : of([]),
+            rank: summoner?.id 
+              ? this.riot.getRankBySummonerId(platform, summoner.id).pipe(catchError(() => of([])))
+              : of([]),
 
             masteries: account?.puuid
               ? this.riot.getChampionMasteriesByPuuid(platform, account.puuid).pipe(catchError(() => of([])))
