@@ -62,6 +62,7 @@ export class SummonerComponent {
   spellsByKey = signal<Record<string, SummonerSpellData>>({});
   itemsById = signal<Record<string, ItemData>>({});
   playerInput = '';
+  topMasteries = signal<any[]>([]);
 
   presets: Array<{ region: RegionUI; gameName: string; tagLine: string; label: string }> = [
     { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
@@ -384,6 +385,10 @@ export class SummonerComponent {
               ? this.riot.getChampionMasteries(platform, summoner.id).pipe(catchError(() => of([])))
               : of([]),
 
+            topMasteries: account?.puuid
+              ? this.riot.getTopChampionMasteries(platform, account.puuid, 3).pipe(catchError(() => of([])))
+              : of([]),
+
             matchIds: this.riot.matchIdsByPuuid(routing, account.puuid, 0, 20),
           }).pipe(map((extra) => ({ account, summoner, platform, ...extra, currentGame: null })))
         )
@@ -391,6 +396,7 @@ export class SummonerComponent {
       .subscribe({
         next: (res) => {
           this.bundle.set(res);
+          this.topMasteries.set(res.topMasteries || []);
 
           // RESET PAGINARE
           this.matches.set([]);

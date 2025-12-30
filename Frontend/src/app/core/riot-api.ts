@@ -137,6 +137,16 @@ export class RiotApiService {
     );
   }
 
+  getTopChampionMasteries(platform: string, puuid: string, count: number = 3): Observable<any[]> {
+    return this.http.get<any[]>(
+      `${
+        this.BASE
+      }/${platform}/lol/champion-mastery/v4/champion-masteries/by-puuid/${encodeURIComponent(
+        puuid
+      )}/top?count=${count}`
+    );
+  }
+
   getChampionMasteryBySummonerId(
     platform: string,
     summonerId: string,

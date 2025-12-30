@@ -443,3 +443,77 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* SIMPLIFIED TOP MASTERY */
+.top-mastery-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.top-mastery-card {
+  background: #1f1f1f;
+  border: 1px solid #3f3f3f;
+  border-radius: 8px;
+  padding: 12px;
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.mastery-rank {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.rank-badge {
+  background: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.rank-badge.gold { color: #fbbf24; }
+.rank-badge.silver { color: #94a3b8; }
+.rank-badge.bronze { color: #fb923c; }
+
+.mastery-details {
+  flex: 1;
+}
+
+.champ-name-large {
+  font-weight: 600;
+  color: #e5e5e5;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.mastery-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-item.simple-points {
+  justify-content: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.stat-item.simple-points .stat-value {
+  font-size: 14px;
+  color: #4ade80;
+}
+
+.stat-item.simple-points .stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 4px;
+}

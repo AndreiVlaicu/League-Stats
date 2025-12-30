@@ -75,6 +75,44 @@
       </div>
       }
 
+      @if (topMasteries()?.length) {
+      <div class="section">
+        <h3>Top 3 Mastery Champions</h3>
+        <div class="top-mastery-grid">
+          @for (m of topMasteries(); track m.championId) {
+          <div class="top-mastery-card">
+            <div class="mastery-rank">
+              @if ($index === 0) {
+                <span class="rank-badge gold">🥇 #1</span>
+              } @else if ($index === 1) {
+                <span class="rank-badge silver">🥈 #2</span>
+              } @else if ($index === 2) {
+                <span class="rank-badge bronze">🥉 #3</span>
+              }
+            </div>
+            <div class="mastery-content">
+              @if (masteryChampIconUrl(m.championId); as ic) {
+              <img [src]="ic" width="60" height="60" class="champ-icon-lg"
+                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
+              }
+              <div class="mastery-details">
+                <div class="champ-name-large">
+                  {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
+                </div>
+                <div class="mastery-stats">
+                  <div class="stat-item simple-points">
+                    <span class="stat-value">{{ m.championPoints?.toLocaleString() }}</span>
+                    <span class="stat-label">pts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+
       @if (b.rank?.length) {
       <div class="section">
         <h3>Ranked</h3>
