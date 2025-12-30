@@ -63,6 +63,7 @@ export class SummonerComponent {
   itemsById = signal<Record<string, ItemData>>({});
   playerInput = '';
   topMasteries = signal<any[]>([]);
+  activeTab = signal<'overview' | 'mastery'>('overview');
 
   presets: Array<{ region: RegionUI; gameName: string; tagLine: string; label: string }> = [
     { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
@@ -381,8 +382,8 @@ export class SummonerComponent {
           forkJoin({
             rank: summoner?.id ? this.riot.getRankBySummonerId(platform, summoner.id) : of([]),
 
-            masteries: summoner?.id
-              ? this.riot.getChampionMasteries(platform, summoner.id).pipe(catchError(() => of([])))
+            masteries: account?.puuid
+              ? this.riot.getChampionMasteriesByPuuid(platform, account.puuid).pipe(catchError(() => of([])))
               : of([]),
 
             topMasteries: account?.puuid

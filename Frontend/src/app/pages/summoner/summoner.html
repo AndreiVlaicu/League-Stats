@@ -64,6 +64,13 @@
         </div>
       </div>
 
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
+        <button class="tab-btn" [class.active]="activeTab() === 'mastery'" (click)="activeTab.set('mastery')">Mastery</button>
+      </div>
+
+      @if (activeTab() === 'overview') {
       @if (b.currentGame) {
       <div class="current-game in-game">
         <app-live-game [embedded]="true" [gameData]="b.currentGame" [platformInput]="b.platform">
@@ -127,33 +134,6 @@
         </div>
       </div>
       }
-
-      @if (b.masteries?.length) {
-      <div class="section">
-        <h3>Top Mastery</h3>
-        <div class="mastery-grid">
-          @for (m of b.masteries.slice(0, 8); track m) {
-          <div class="mastery-card">
-            <div class="mastery-content">
-              @if (masteryChampIconUrl(m.championId); as ic) {
-              <img [src]="ic" width="40" height="40" class="champ-icon"
-                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
-              }
-              <div>
-                <div class="champ-name">
-                  {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
-                </div>
-                <div><b>Level:</b> {{ m.championLevel }}</div>
-                <div><b>Points:</b> {{ m.championPoints }}</div>
-              </div>
-            </div>
-          </div>
-          }
-        </div>
-      </div>
-      }
-
-
 
       @if (matches().length) {
       <div class="match-filter-bar">
@@ -234,6 +214,34 @@
         </div>
         }
       </div>
+      }
+      }
+
+      @if (activeTab() === 'mastery') {
+        @if (b.masteries?.length) {
+        <div class="section">
+          <h3>All Champion Masteries</h3>
+          <div class="mastery-grid">
+            @for (m of b.masteries; track m.championId) {
+            <div class="mastery-card">
+              <div class="mastery-content">
+                @if (masteryChampIconUrl(m.championId); as ic) {
+                <img [src]="ic" width="40" height="40" class="champ-icon"
+                  [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
+                }
+                <div>
+                  <div class="champ-name">
+                    {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
+                  </div>
+                  <div><b>Level:</b> {{ m.championLevel }}</div>
+                  <div><b>Points:</b> {{ m.championPoints?.toLocaleString() }}</div>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+        }
       }
 
     </div>
