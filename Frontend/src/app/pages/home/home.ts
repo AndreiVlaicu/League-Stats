@@ -5,6 +5,7 @@ import { forkJoin, of, switchMap, throwError } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, map } from 'rxjs/operators';
+import { FavoritesService, FavoritePlayer } from '../../core/services/favorites';
 
 import { RegionUI, REGION_TO_PLATFORM, REGION_TO_ROUTING } from '../../core/regions';
 
@@ -35,7 +36,6 @@ export class HomeComponent {
     { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
     { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
     { region: 'EUNE', gameName: 'Gimishoor', tagLine: '1337', label: 'Gimishoor#1337 (EUNE)' },
-
   ];
 
   uniqueGameNames(): string[] {
@@ -43,6 +43,24 @@ export class HomeComponent {
   }
   uniqueTagLines(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.tagLine))).sort();
+  }
+  favs = inject(FavoritesService);
+
+  // (opțional) deschide pagina cu toate favoritele
+  goFavorites() {
+    this.router.navigate(['/favorites']);
+  }
+
+  openFavorite(f: FavoritePlayer) {
+    this.router.navigate(['/summoner', f.region, f.gameName, f.tagLine]);
+  }
+
+  removeFavorite(f: FavoritePlayer) {
+    this.favs.remove(f.region, f.gameName, f.tagLine);
+  }
+
+  clearFavorites() {
+    this.favs.clear();
   }
 
   applyPlayerInput(value?: string) {

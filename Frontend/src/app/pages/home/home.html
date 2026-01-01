@@ -49,7 +49,12 @@
           }
         </datalist>
 
-        <input [(ngModel)]="tagLine" placeholder="Tag Line" list="tagLineList" class="input flex-1" />
+        <input
+          [(ngModel)]="tagLine"
+          placeholder="Tag Line"
+          list="tagLineList"
+          class="input flex-1"
+        />
         <datalist id="tagLineList">
           @for (t of uniqueTagLines(); track t) {
           <option [value]="t"></option>
@@ -61,6 +66,37 @@
         <button (click)="openSummoner()" class="btn btn-primary">View Profile</button>
         <button (click)="search()" class="btn btn-secondary">Quick Search</button>
       </div>
+
+      <!-- ✅ FAVORITES (nou) -->
+      @if (favs.favorites().length) {
+      <div class="favorites-section">
+        <div class="favorites-header">
+          <h3>Favorites</h3>
+
+          <div class="favorites-actions">
+            <!-- dacă NU ai ruta /favorites, poți șterge butonul ăsta -->
+            <button class="btn btn-secondary btn-sm" (click)="goFavorites()">View all</button>
+            <button class="btn btn-secondary btn-sm" (click)="clearFavorites()">Clear</button>
+          </div>
+        </div>
+
+        <div class="favorites-list">
+          @for (f of favs.favorites().slice(0, 6); track f.key) {
+          <div class="favorite-card">
+            <div class="favorite-title">
+              {{ f.label || f.gameName + '#' + f.tagLine }}
+              <span class="muted">({{ f.region }})</span>
+            </div>
+
+            <div class="favorite-buttons">
+              <button class="btn btn-primary btn-sm" (click)="openFavorite(f)">Open</button>
+              <button class="btn btn-secondary btn-sm" (click)="removeFavorite(f)">Remove</button>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
     </div>
 
     @if (loading()) {
