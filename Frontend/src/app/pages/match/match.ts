@@ -113,24 +113,24 @@ export class MatchComponent {
       const matchId = pm.get('matchId') ?? '';
       this.matchId.set(matchId);
       this.puuid.set(pm.get('puuid') ?? '');
-      
+
       const prefix = matchId.split('_')[0].toUpperCase();
       const regionMap: Record<string, string> = {
-        'EUW1': 'EUW',
-        'EUN1': 'EUNE',
-        'NA1': 'NA',
-        'KR': 'KR',
-        'BR1': 'BR',
-        'JP1': 'JP',
-        'OC1': 'OCE',
-        'TR1': 'TR',
-        'RU': 'RU',
-        'LA1': 'LAN',
-        'LA2': 'LAS',
+        EUW1: 'EUW',
+        EUN1: 'EUNE',
+        NA1: 'NA',
+        KR: 'KR',
+        BR1: 'BR',
+        JP1: 'JP',
+        OC1: 'OCE',
+        TR1: 'TR',
+        RU: 'RU',
+        LA1: 'LAN',
+        LA2: 'LAS',
       };
-      
+
       this.region.set(regionMap[prefix] || 'EUW');
-      
+
       this.load();
     });
   }
@@ -146,16 +146,64 @@ export class MatchComponent {
   toggleTimeline() {
     this.timelineExpanded.set(!this.timelineExpanded());
   }
-
+  private platformFromRegion(region: string): string | null {
+    const r = (region || '').toUpperCase();
+    const map: Record<string, string> = {
+      EUW: 'euw1',
+      EUNE: 'eun1',
+      NA: 'na1',
+      KR: 'kr',
+      BR: 'br1',
+      JP: 'jp1',
+      OCE: 'oc1',
+      TR: 'tr1',
+      RU: 'ru',
+      LAN: 'la1',
+      LAS: 'la2',
+    };
+    return map[r] ?? null;
+  }
   openParticipantProfile(participant: any) {
-    const gameName = participant.riotIdGameName || participant.summonerName;
-    const tagLine = participant.riotIdTagLine;
-    
+    const region = (this.region() || 'EUW').toUpperCase();
+
+    const gameName = (participant?.riotIdGameName || '').trim();
+    const tagLine = (participant?.riotIdTagLine || '').trim();
+
+    // 1) Cel mai bine: avem Riot ID direct din match-v5
     if (gameName && tagLine) {
-      this.router.navigate(['/summoner', this.region(), gameName, tagLine]);
-    } else if (participant.puuid) {
-      this.router.navigate(['/summoner-puuid', this.region(), participant.puuid]);
+      this.router.navigate(['/summoner', region, gameName, tagLine]);
+      return;
     }
+
+    // 2) Fallback: avem puuid
+    const puuid = participant?.puuid;
+    if (puuid) {
+      this.router.navigate(['/summoner-puuid', region, puuid]);
+      return;
+    }
+
+    // 3) Ultim fallback: avem summonerId -> luăm puuid via Summoner-V4
+    const summonerId = participant?.summonerId;
+    const platform = this.platformFromRegion(region);
+
+    if (summonerId && platform) {
+      this.riot.summonerBySummonerId(platform, summonerId).subscribe({
+        next: (s) => {
+          if (s?.puuid) {
+            this.router.navigate(['/summoner-puuid', region, s.puuid]);
+          } else {
+            this.error.set("Couldn't open the profile (missing puuid and the lookup failed).");
+          }
+        },
+        error: () => {
+          this.error.set("Couldn't open the profile (missing puuid and the lookup failed).");
+        },
+      });
+      return;
+    }
+
+    // 4) Nimic disponibil
+    this.error.set("Couldn't open the profile (missing Riot ID and puuid).");
   }
 
   private ddVer(): string {
@@ -224,7 +272,7 @@ export class MatchComponent {
   getPlayerDisplayName(p: any): string {
     const gameName = p?.riotIdGameName || p?.summonerName || 'Player';
     const tagLine = p?.riotIdTagLine;
-    
+
     if (gameName && tagLine) {
       return `${gameName}#${tagLine}`;
     }

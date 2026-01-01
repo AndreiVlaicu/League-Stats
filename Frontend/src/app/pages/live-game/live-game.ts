@@ -77,7 +77,7 @@ export class LiveGameComponent implements OnChanges {
         const s = pm.get('summonerId');
         if (p) this.platform.set(p);
         if (s) this.summonerId.set(s);
-        
+
         if (p && s) {
           this.load();
         }
@@ -99,6 +99,27 @@ export class LiveGameComponent implements OnChanges {
   }
   home() {
     this.router.navigate(['/']);
+  }
+  openProfile(p: any) {
+    const puuid = p?.puuid;
+    if (puuid) {
+      this.openByPuuid(puuid);
+      return;
+    }
+
+    const sid = p?.summonerId;
+    if (!sid) return;
+
+    const platform = this.platform();
+
+    this.riot.summonerBySummonerId(platform, sid).subscribe({
+      next: (s) => {
+        if (s?.puuid) this.openByPuuid(s.puuid);
+      },
+      error: () => {
+        this.error.set('Unable to open the profile (missing PUUID and the lookup failed).');
+      },
+    });
   }
 
   private regionFromPlatform(platform: string): RegionUI {
@@ -150,7 +171,7 @@ export class LiveGameComponent implements OnChanges {
 
   isArenaMode() {
     const g = this.game();
-    return (g?.participants?.length === 16) || (g?.gameMode === 'CHERRY');
+    return g?.participants?.length === 16 || g?.gameMode === 'CHERRY';
   }
 
   allParticipants() {

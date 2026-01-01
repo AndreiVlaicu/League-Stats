@@ -14,8 +14,8 @@
       <div class="match-info">
         <span><b>Queue:</b> {{ queueName(d.match?.info?.queueId) }}</span>
         <span
-          ><b>Duration:</b> {{ (d.match?.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }}
-          min</span
+          ><b>Duration:</b>
+          {{ (d.match?.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</span
         >
       </div>
 
@@ -28,7 +28,10 @@
           <div class="team-card blue">
             <div class="team-header">
               <span class="team-name">Blue (100)</span>
-              <span class="team-result" [class.win]="tmap[100]?.win" [class.loss]="!tmap[100]?.win"
+              <span
+                class="team-result"
+                [class.win]="tmap[100]?.win"
+                [class.loss]="!tmap[100]?.win"
                 >{{ tmap[100]?.win ? 'WIN' : 'LOSS' }}</span
               >
             </div>
@@ -51,7 +54,10 @@
           <div class="team-card red">
             <div class="team-header">
               <span class="team-name">Red (200)</span>
-              <span class="team-result" [class.win]="tmap[200]?.win" [class.loss]="!tmap[200]?.win"
+              <span
+                class="team-result"
+                [class.win]="tmap[200]?.win"
+                [class.loss]="!tmap[200]?.win"
                 >{{ tmap[200]?.win ? 'WIN' : 'LOSS' }}</span
               >
             </div>
@@ -77,11 +83,7 @@
         <h3>Your Performance</h3>
         <div class="player-highlight">
           <div class="player-content">
-            <img
-              *ngIf="champIconUrl(p.championId) as cicon"
-              [src]="cicon"
-              class="champ-icon-lg"
-            />
+            <img *ngIf="champIconUrl(p.championId) as cicon" [src]="cicon" class="champ-icon-lg" />
 
             <div class="player-info">
               <div class="player-champ">
@@ -133,7 +135,7 @@
           <div class="participants-column">
             <h4 class="column-title win">Winners</h4>
             <div
-              *ngFor="let p of d.match?.info?.participants | filter: 'win':true"
+              *ngFor="let p of d.match?.info?.participants | filter : 'win' : true"
               class="participant-card"
               [class.highlighted]="p.puuid === puuid()"
             >
@@ -146,7 +148,11 @@
                   />
 
                   <div class="participant-info">
-                    <div class="participant-name" (click)="openParticipantProfile(p)" style="cursor: pointer;">
+                    <div
+                      class="participant-name"
+                      (click)="openParticipantProfile(p)"
+                      style="cursor: pointer"
+                    >
                       {{ getPlayerDisplayName(p) }}
                       <span class="participant-champ">
                         — {{ champName(p.championId) || '#' + p.championId }}
@@ -187,6 +193,15 @@
                 <div class="participant-extra">
                   <div>Gold: {{ p.goldEarned }}</div>
                   <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
+
+                  <!-- ✅ NEW: Profile button -->
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    (click)="openParticipantProfile(p)"
+                  >
+                    Profile
+                  </button>
                 </div>
               </div>
             </div>
@@ -196,7 +211,7 @@
           <div class="participants-column">
             <h4 class="column-title loss">Losers</h4>
             <div
-              *ngFor="let p of d.match?.info?.participants | filter: 'win':false"
+              *ngFor="let p of d.match?.info?.participants | filter : 'win' : false"
               class="participant-card"
               [class.highlighted]="p.puuid === puuid()"
             >
@@ -209,7 +224,11 @@
                   />
 
                   <div class="participant-info">
-                    <div class="participant-name" (click)="openParticipantProfile(p)" style="cursor: pointer;">
+                    <div
+                      class="participant-name"
+                      (click)="openParticipantProfile(p)"
+                      style="cursor: pointer"
+                    >
                       {{ getPlayerDisplayName(p) }}
                       <span class="participant-champ">
                         — {{ champName(p.championId) || '#' + p.championId }}
@@ -250,6 +269,15 @@
                 <div class="participant-extra">
                   <div>Gold: {{ p.goldEarned }}</div>
                   <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
+
+                  <!-- ✅ NEW: Profile button -->
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-sm"
+                    (click)="openParticipantProfile(p)"
+                  >
+                    Profile
+                  </button>
                 </div>
               </div>
             </div>
@@ -258,10 +286,7 @@
       </div>
 
       <!-- Timeline -->
-      <div
-        *ngIf="killFeed().length || objectiveFeed().length"
-        class="section"
-      >
+      <div *ngIf="killFeed().length || objectiveFeed().length" class="section">
         <div class="timeline-header" (click)="toggleTimeline()">
           <h3>Timeline</h3>
           <span class="toggle-icon">{{ timelineExpanded() ? '▼' : '▶' }}</span>

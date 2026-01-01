@@ -56,7 +56,7 @@
                     <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
                   }
                 </div>
-                
+
                 @if (champIconUrl(p.championId); as cicon) {
                   <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
                 }
@@ -65,6 +65,16 @@
                   <div class="player-name" (click)="openByPuuid(p.puuid)">
                     {{ p.riotId || p.summonerName }}
                   </div>
+
+                  <!-- ✅ NEW: Profile button -->
+                  <button
+                    type="button"
+                    class="profile-btn"
+                    (click)="openByPuuid(p.puuid)"
+                  >
+                    View Profile
+                  </button>
+
                   <div class="champ-name">
                     {{ champName(p.championId) }}
                   </div>
@@ -80,6 +90,7 @@
             <div class="team-header">
               <span>Blue Team</span>
             </div>
+
             @for (p of team(100); track p.summonerId) {
             <div class="participant-row">
               <div class="spells-col">
@@ -90,7 +101,7 @@
                   <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
                 }
               </div>
-              
+
               @if (champIconUrl(p.championId); as cicon) {
                 <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
               }
@@ -99,6 +110,16 @@
                 <div class="player-name" (click)="openByPuuid(p.puuid)">
                   {{ p.riotId || p.summonerName }}
                 </div>
+
+                <!-- ✅ NEW: Profile button -->
+                <button
+                  type="button"
+                  class="profile-btn"
+                  (click)="openByPuuid(p.puuid)"
+                >
+                  View Profile
+                </button>
+
                 <div class="champ-name">
                   {{ champName(p.championId) }}
                 </div>
@@ -112,6 +133,7 @@
           <div class="team-header">
             <span>Red Team</span>
           </div>
+
           @for (p of team(200); track p.summonerId) {
             <div class="participant-row">
               <div class="spells-col">
@@ -122,7 +144,7 @@
                   <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
                 }
               </div>
-              
+
               @if (champIconUrl(p.championId); as cicon) {
                 <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
               }
@@ -131,6 +153,16 @@
                 <div class="player-name" (click)="openByPuuid(p.puuid)">
                   {{ p.riotId || p.summonerName }}
                 </div>
+
+                <!-- ✅ NEW: Profile button -->
+                <button
+                  type="button"
+                  class="profile-btn"
+                  (click)="openByPuuid(p.puuid)"
+                >
+                  View Profile
+                </button>
+
                 <div class="champ-name">
                   {{ champName(p.championId) }}
                 </div>
