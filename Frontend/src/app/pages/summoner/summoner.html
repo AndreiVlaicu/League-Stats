@@ -15,8 +15,13 @@
         <option>LAS</option>
       </select>
 
-      <input [(ngModel)]="playerInput" list="playerList" placeholder="gameName#tagLine (e.g., Caps#G2)"
-        class="input flex-1" (ngModelChange)="applyPlayerInput($event)" />
+      <input
+        [(ngModel)]="playerInput"
+        list="playerList"
+        placeholder="gameName#tagLine (e.g., Caps#G2)"
+        class="input flex-1"
+        (ngModelChange)="applyPlayerInput($event)"
+      />
 
       <datalist id="playerList">
         @for (p of presets; track p.label) {
@@ -52,19 +57,33 @@
       <div class="profile-header">
         <div class="profile-main">
           @if (profileIconUrl(b.summoner.profileIconId); as iconUrl) {
-          <img [src]="iconUrl" class="profile-icon" [alt]="'Profile Icon ' + b.summoner.profileIconId" />
+          <img
+            [src]="iconUrl"
+            class="profile-icon"
+            [alt]="'Profile Icon ' + b.summoner.profileIconId"
+          />
           }
           <div class="profile-text">
             <h2>{{ b.account.gameName }}#{{ b.account.tagLine }}</h2>
+            <button
+              type="button"
+              class="btn favorite-btn"
+              [class.active]="isFavorite(b)"
+              (click)="toggleFavorite(b)"
+            >
+              <span class="star">{{ isFavorite(b) ? '★' : '☆' }}</span>
+              <span>{{ isFavorite(b) ? 'Favorited' : 'Add to favorites' }}</span>
+            </button>
+
             <div class="profile-info">
               <span><b>Platform:</b> {{ b.platform }}</span>
               <span><b>Level:</b> {{ b.summoner.summonerLevel }}</span>
-              @if (b.rank && b.rank.length > 0) {
-                @for (r of b.rank; track r.queueType) {
-                  <span><b>{{ r.queueType }}:</b> {{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)</span>
-                }
-              } @else {
-                <span><b>Rank:</b> Unranked</span>
+              @if (b.rank && b.rank.length > 0) { @for (r of b.rank; track r.queueType) {
+              <span
+                ><b>{{ r.queueType }}:</b> {{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)</span
+              >
+              } } @else {
+              <span><b>Rank:</b> Unranked</span>
               }
             </div>
           </div>
@@ -73,12 +92,23 @@
 
       <!-- TABS -->
       <div class="tabs">
-        <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="activeTab.set('overview')">Overview</button>
-        <button class="tab-btn" [class.active]="activeTab() === 'mastery'" (click)="activeTab.set('mastery')">Mastery</button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === 'overview'"
+          (click)="activeTab.set('overview')"
+        >
+          Overview
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === 'mastery'"
+          (click)="activeTab.set('mastery')"
+        >
+          Mastery
+        </button>
       </div>
 
-      @if (activeTab() === 'overview') {
-      @if (b.currentGame) {
+      @if (activeTab() === 'overview') { @if (b.currentGame) {
       <div class="current-game in-game">
         <app-live-game [embedded]="true" [gameData]="b.currentGame" [platformInput]="b.platform">
         </app-live-game>
@@ -87,9 +117,7 @@
       <div class="current-game not-in-game">
         <button (click)="checkLiveGame()" class="btn btn-primary">Check Live Match</button>
       </div>
-      }
-
-      @if (topMasteries()?.length) {
+      } @if (topMasteries()?.length) {
       <div class="section">
         <h3>Top 3 Mastery Champions</h3>
         <div class="top-mastery-grid">
@@ -97,17 +125,22 @@
           <div class="top-mastery-card">
             <div class="mastery-rank">
               @if ($index === 0) {
-                <span class="rank-badge gold">🥇 #1</span>
+              <span class="rank-badge gold">🥇 #1</span>
               } @else if ($index === 1) {
-                <span class="rank-badge silver">🥈 #2</span>
+              <span class="rank-badge silver">🥈 #2</span>
               } @else if ($index === 2) {
-                <span class="rank-badge bronze">🥉 #3</span>
+              <span class="rank-badge bronze">🥉 #3</span>
               }
             </div>
             <div class="mastery-content">
               @if (masteryChampIconUrl(m.championId); as ic) {
-              <img [src]="ic" width="60" height="60" class="champ-icon-lg"
-                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
+              <img
+                [src]="ic"
+                width="60"
+                height="60"
+                class="champ-icon-lg"
+                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId"
+              />
               }
               <div class="mastery-details">
                 <div class="champ-name-large">
@@ -125,9 +158,7 @@
           }
         </div>
       </div>
-      }
-
-      @if (championSummary.length) {
+      } @if (championSummary.length) {
       <div class="section">
         <h3>Recent Champions</h3>
         <div class="recent-champs-grid">
@@ -135,7 +166,7 @@
           <div class="recent-champ-card">
             <div class="recent-champ-header">
               @if (masteryChampIconUrl(c.championId); as ic) {
-                <img [src]="ic" class="recent-champ-icon" [alt]="c.championName" />
+              <img [src]="ic" class="recent-champ-icon" [alt]="c.championName" />
               }
               <div class="recent-champ-name">{{ c.championName }}</div>
             </div>
@@ -146,14 +177,18 @@
               </div>
               <div class="stat-row">
                 <span class="stat-label">Winrate:</span>
-                <span class="stat-val" [class.high-wr]="(c.wins / c.count) >= 0.5" [class.low-wr]="(c.wins / c.count) < 0.5">
-                  {{ (c.wins / c.count * 100) | number:'1.0-0' }}%
+                <span
+                  class="stat-val"
+                  [class.high-wr]="c.wins / c.count >= 0.5"
+                  [class.low-wr]="c.wins / c.count < 0.5"
+                >
+                  {{ (c.wins / c.count) * 100 | number : '1.0-0' }}%
                 </span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">KDA:</span>
                 <span class="stat-val">
-                  {{ ((c.kills + c.assists) / (c.deaths || 1)) | number:'1.2-2' }}
+                  {{ (c.kills + c.assists) / (c.deaths || 1) | number : '1.2-2' }}
                 </span>
               </div>
             </div>
@@ -161,13 +196,15 @@
           }
         </div>
       </div>
-      }
-
-      @if (matches().length) {
+      } @if (matches().length) {
       <div class="match-filter-bar">
         <label class="match-filter-label">Match Type:</label>
 
-        <select class="match-type-select" [ngModel]="matchType()" (ngModelChange)="matchType.set($event)">
+        <select
+          class="match-type-select"
+          [ngModel]="matchType()"
+          (ngModelChange)="matchType.set($event)"
+        >
           <option value="ALL">All</option>
           <option value="RANKED">Ranked</option>
           <option value="NORMAL">Normal</option>
@@ -176,22 +213,26 @@
           <option value="OTHER">Other</option>
         </select>
       </div>
-      }
-
-
-      @if (filteredMatches.length) {
+      } @if (filteredMatches.length) {
       <div class="section">
         <h3>Match History ({{ filteredMatches.length }})</h3>
         @for (m of filteredMatches; track m.metadata.matchId) {
         <div class="match-card">
           <div class="match-header">
-            <div><b>{{ queueName(m.info?.queueId) }}</b></div>
-            <div><b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min</div>
+            <div>
+              <b>{{ queueName(m.info?.queueId) }}</b>
+            </div>
+            <div>
+              <b>Duration:</b> {{ (m.info?.gameDuration ?? 0) / 60 | number : '1.0-0' }} min
+            </div>
           </div>
 
           <div class="match-id">{{ m.metadata?.matchId }}</div>
 
-          <button (click)="openMatch(m.metadata?.matchId, bundle().account.puuid)" class="btn btn-primary">
+          <button
+            (click)="openMatch(m.metadata?.matchId, bundle().account.puuid)"
+            class="btn btn-primary"
+          >
             Details
           </button>
 
@@ -199,8 +240,13 @@
           <div class="player-summary">
             <div class="player-content">
               @if (champIconUrl(p.championId); as cicon) {
-              <img [src]="cicon" width="52" height="52" class="champ-icon-lg"
-                [title]="champName(p.championId) || 'Champion #' + p.championId" />
+              <img
+                [src]="cicon"
+                width="52"
+                height="52"
+                class="champ-icon-lg"
+                [title]="champName(p.championId) || 'Champion #' + p.championId"
+              />
               }
 
               <div class="player-info">
@@ -213,13 +259,30 @@
 
                 <div class="items-row">
                   @if (spellIconUrl(p.summoner1Id); as s1) {
-                  <img [src]="s1" width="26" height="26" class="item-icon"
-                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'" />
+                  <img
+                    [src]="s1"
+                    width="26"
+                    height="26"
+                    class="item-icon"
+                    [title]="spellTitle(p.summoner1Id) || 'Spell 1'"
+                  />
                   } @if (spellIconUrl(p.summoner2Id); as s2) {
-                  <img [src]="s2" width="26" height="26" class="item-icon"
-                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'" />
-                  } @for (it of itemIds(p); let idx = $index; track idx) { @if (itemIconUrl(it); as iu) {
-                  <img [src]="iu" width="26" height="26" class="item-icon" [title]="itemTitle(it)" />
+                  <img
+                    [src]="s2"
+                    width="26"
+                    height="26"
+                    class="item-icon"
+                    [title]="spellTitle(p.summoner2Id) || 'Spell 2'"
+                  />
+                  } @for (it of itemIds(p); let idx = $index; track idx) { @if (itemIconUrl(it); as
+                  iu) {
+                  <img
+                    [src]="iu"
+                    width="26"
+                    height="26"
+                    class="item-icon"
+                    [title]="itemTitle(it)"
+                  />
                   } }
                 </div>
               </div>
@@ -229,11 +292,13 @@
           <div class="player-not-found">Player not found in this match.</div>
           }
         </div>
-        }
-
-        @if (hasMoreMatches()) {
+        } @if (hasMoreMatches()) {
         <div class="load-more">
-          <button class="btn btn-primary load-more-btn" (click)="loadMoreMatches()" [disabled]="isLoadingMore()">
+          <button
+            class="btn btn-primary load-more-btn"
+            (click)="loadMoreMatches()"
+            [disabled]="isLoadingMore()"
+          >
             <span *ngIf="isLoadingMore(); else loadText">
               <span class="spinner"></span> Loading...
             </span>
@@ -242,36 +307,35 @@
         </div>
         }
       </div>
-      }
-      }
-
-      @if (activeTab() === 'mastery') {
-        @if (b.masteries?.length) {
-        <div class="section">
-          <h3>All Champion Masteries</h3>
-          <div class="mastery-grid">
-            @for (m of b.masteries; track m.championId) {
-            <div class="mastery-card">
-              <div class="mastery-content">
-                @if (masteryChampIconUrl(m.championId); as ic) {
-                <img [src]="ic" width="40" height="40" class="champ-icon"
-                  [title]="masteryChampName(m.championId) || 'Champion #' + m.championId" />
-                }
-                <div>
-                  <div class="champ-name">
-                    {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
-                  </div>
-                  <div><b>Level:</b> {{ m.championLevel }}</div>
-                  <div><b>Points:</b> {{ m.championPoints?.toLocaleString() }}</div>
+      } } @if (activeTab() === 'mastery') { @if (b.masteries?.length) {
+      <div class="section">
+        <h3>All Champion Masteries</h3>
+        <div class="mastery-grid">
+          @for (m of b.masteries; track m.championId) {
+          <div class="mastery-card">
+            <div class="mastery-content">
+              @if (masteryChampIconUrl(m.championId); as ic) {
+              <img
+                [src]="ic"
+                width="40"
+                height="40"
+                class="champ-icon"
+                [title]="masteryChampName(m.championId) || 'Champion #' + m.championId"
+              />
+              }
+              <div>
+                <div class="champ-name">
+                  {{ masteryChampName(m.championId) || 'Champion #' + m.championId }}
                 </div>
+                <div><b>Level:</b> {{ m.championLevel }}</div>
+                <div><b>Points:</b> {{ m.championPoints?.toLocaleString() }}</div>
               </div>
             </div>
-            }
           </div>
+          }
         </div>
-        }
-      }
-
+      </div>
+      } }
     </div>
     }
   </div>

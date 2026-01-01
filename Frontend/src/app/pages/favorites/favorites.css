@@ -1,0 +1,114 @@
+.favorites-container {
+  min-height: 100vh;
+  background: #121212;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+.favorites-card {
+  width: 100%;
+  max-width: 700px;
+  background: #1f1f1f;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.favorites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.favorites-header h2 {
+  margin: 0;
+  color: #22c55e;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.favorites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.favorite-item {
+  background: #2a2a2a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #333;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 600;
+  color: #e5e5e5;
+}
+
+.region {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background: #22c55e;
+  color: #052e16;
+}
+
+.btn.primary:hover {
+  background: #16a34a;
+}
+
+.btn.secondary {
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn.secondary:hover {
+  background: #525252;
+}
+
+.btn.danger {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+.btn.danger:hover {
+  background: #991b1b;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #9ca3af;
+  font-style: italic;
+}

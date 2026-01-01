@@ -18,5 +18,9 @@ export const routes: Routes = [
   },
   { path: 'live/:platform/:summonerId', component: LiveGameComponent },
   { path: 'summoner-puuid/:region/:puuid', component: SummonerByPuuidComponent },
+  {
+    path: 'favorites',
+    loadComponent: () => import('./pages/favorites/favorites').then((m) => m.FavoritesComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

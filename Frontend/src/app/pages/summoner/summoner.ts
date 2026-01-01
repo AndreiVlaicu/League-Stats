@@ -5,6 +5,7 @@ import { forkJoin, of, throwError } from 'rxjs';
 import { switchMap, map, catchError } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { Location } from '@angular/common';
+import { FavoritesService } from '../../core/services/favorites';
 
 import { RiotApiService } from '../../core/riot-api';
 import {
@@ -39,7 +40,7 @@ export class SummonerComponent {
   get filteredMatches() {
     const type = this.matchType();
     if (type === 'ALL') return this.matches();
-    return this.matches().filter(m => this.getMatchType(m?.info?.queueId) === type);
+    return this.matches().filter((m) => this.getMatchType(m?.info?.queueId) === type);
   }
 
   get championSummary() {
@@ -48,15 +49,18 @@ export class SummonerComponent {
     const puuid = b.account.puuid;
     const matches = this.matches();
 
-    const stats: Record<string, {
-      championName: string;
-      championId: number;
-      count: number;
-      wins: number;
-      kills: number;
-      deaths: number;
-      assists: number;
-    }> = {};
+    const stats: Record<
+      string,
+      {
+        championName: string;
+        championId: number;
+        count: number;
+        wins: number;
+        kills: number;
+        deaths: number;
+        assists: number;
+      }
+    > = {};
 
     for (const m of matches) {
       if (!m?.info?.participants) continue;
@@ -72,7 +76,7 @@ export class SummonerComponent {
           wins: 0,
           kills: 0,
           deaths: 0,
-          assists: 0
+          assists: 0,
         };
       }
       stats[cid].count++;
@@ -83,7 +87,7 @@ export class SummonerComponent {
     }
 
     return Object.values(stats)
-      .filter(s => s.count > 1)
+      .filter((s) => s.count > 1)
       .sort((a, b) => b.count - a.count);
   }
 
@@ -91,6 +95,8 @@ export class SummonerComponent {
   private router = inject(Router);
   private riot = inject(RiotApiService);
   private location = inject(Location);
+
+  private favs = inject(FavoritesService);
 
   private champs = inject(ChampionService);
   private ddragon = inject(ChampionService);
@@ -123,6 +129,23 @@ export class SummonerComponent {
   isLoadingMore = signal(false);
   hasMoreMatches = signal(true);
 
+  toggleFavorite(b: any) {
+    const acc = b?.account;
+    if (!acc) return;
+    this.favs.toggle(
+      this.region,
+      acc.gameName,
+      acc.tagLine,
+      `${acc.gameName}#${acc.tagLine} (${this.region})`
+    );
+  }
+
+  isFavorite(b: any): boolean {
+    const acc = b?.account;
+    if (!acc) return false;
+    return this.favs.isFavorite(this.region, acc.gameName, acc.tagLine);
+  }
+
   uniqueGameNames(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.gameName))).sort();
   }
@@ -141,37 +164,34 @@ export class SummonerComponent {
     const routing = REGION_TO_ROUTING[this.region];
     const puuid = b.account.puuid;
 
-    this.riot.matchIdsByPuuid(routing, puuid, this.currentStart, this.pageSize)
-      .subscribe(ids => {
-        if (!ids.length) {
-          this.hasMoreMatches.set(false);
-          this.isLoadingMore.set(false);
-          return;
-        }
+    this.riot.matchIdsByPuuid(routing, puuid, this.currentStart, this.pageSize).subscribe((ids) => {
+      if (!ids.length) {
+        this.hasMoreMatches.set(false);
+        this.isLoadingMore.set(false);
+        return;
+      }
 
-        this.currentStart += ids.length;
+      this.currentStart += ids.length;
 
-        let loaded = 0;
-        ids.forEach(id => {
-          this.riot.matchById(routing, id).subscribe({
-            next: match => {
-              this.matches.update(arr => [...arr, match]);
-            },
-            complete: () => {
-              loaded++;
-              if (loaded === ids.length) {
-                if (ids.length < this.pageSize) {
-                  this.hasMoreMatches.set(false);
-                }
-                this.isLoadingMore.set(false);
+      let loaded = 0;
+      ids.forEach((id) => {
+        this.riot.matchById(routing, id).subscribe({
+          next: (match) => {
+            this.matches.update((arr) => [...arr, match]);
+          },
+          complete: () => {
+            loaded++;
+            if (loaded === ids.length) {
+              if (ids.length < this.pageSize) {
+                this.hasMoreMatches.set(false);
               }
+              this.isLoadingMore.set(false);
             }
-          });
+          },
         });
       });
+    });
   }
-
-
 
   applyPlayerInput(value?: string) {
     const raw = (value ?? this.playerInput ?? '').trim();
@@ -273,25 +293,28 @@ export class SummonerComponent {
 
     this.error.set(null);
 
-    this.riot.getCurrentGameByPuuid(b.platform, b.summoner.puuid).pipe(
-      catchError((err) => {
-        if (err?.status === 404) {
-          return of(null);
-        }
-        return throwError(() => err);
-      })
-    ).subscribe({
-      next: (currentGame) => {
-        if (currentGame) {
-          this.bundle.set({ ...b, currentGame });
-        } else {
-          this.error.set('The user is not in a game.');
-        }
-      },
-      error: (err) => {
-        this.error.set('Error checking live game.');
-      }
-    });
+    this.riot
+      .getCurrentGameByPuuid(b.platform, b.summoner.puuid)
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 404) {
+            return of(null);
+          }
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: (currentGame) => {
+          if (currentGame) {
+            this.bundle.set({ ...b, currentGame });
+          } else {
+            this.error.set('The user is not in a game.');
+          }
+        },
+        error: (err) => {
+          this.error.set('Error checking live game.');
+        },
+      });
   }
 
   openMatch(arg1: any, arg2?: any) {
@@ -426,16 +449,20 @@ export class SummonerComponent {
 
         switchMap(({ account, summoner, platform }) =>
           forkJoin({
-            rank: summoner?.id 
+            rank: summoner?.id
               ? this.riot.getRankBySummonerId(platform, summoner.id).pipe(catchError(() => of([])))
               : of([]),
 
             masteries: account?.puuid
-              ? this.riot.getChampionMasteriesByPuuid(platform, account.puuid).pipe(catchError(() => of([])))
+              ? this.riot
+                  .getChampionMasteriesByPuuid(platform, account.puuid)
+                  .pipe(catchError(() => of([])))
               : of([]),
 
             topMasteries: account?.puuid
-              ? this.riot.getTopChampionMasteries(platform, account.puuid, 3).pipe(catchError(() => of([])))
+              ? this.riot
+                  .getTopChampionMasteries(platform, account.puuid, 3)
+                  .pipe(catchError(() => of([])))
               : of([]),
 
             matchIds: this.riot.matchIdsByPuuid(routing, account.puuid, 0, 20),

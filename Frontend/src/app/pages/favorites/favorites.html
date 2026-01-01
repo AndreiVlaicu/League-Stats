@@ -1,0 +1,34 @@
+<div class="favorites-container">
+  <div class="favorites-card">
+    <div class="favorites-header">
+      <h2>⭐ Favorites</h2>
+
+      <div class="actions">
+        <button class="btn secondary" (click)="home()">Home</button>
+        <button class="btn danger" (click)="clear()">Clear all</button>
+      </div>
+    </div>
+
+    @if (!favs.favorites().length) {
+    <div class="empty">No favorite players yet.</div>
+    } @else {
+    <div class="favorites-list">
+      @for (f of favs.favorites(); track f.key) {
+      <div class="favorite-item">
+        <div class="info">
+          <div class="name">
+            {{ f.label || f.gameName + '#' + f.tagLine }}
+          </div>
+          <div class="region">{{ f.region }}</div>
+        </div>
+
+        <div class="buttons">
+          <button class="btn primary" (click)="open(f)">Open</button>
+          <button class="btn danger" (click)="remove(f)">Remove</button>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>
