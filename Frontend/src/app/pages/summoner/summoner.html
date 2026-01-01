@@ -127,15 +127,36 @@
       </div>
       }
 
-      @if (b.rank?.length) {
+      @if (championSummary.length) {
       <div class="section">
-        <h3>Ranked</h3>
-        <div class="rank-list">
-          @for (r of b.rank; track r) {
-          <div class="rank-card">
-            <div><b>{{ r.queueType }}</b></div>
-            <div>{{ r.tier }} {{ r.rank }} ({{ r.leaguePoints }} LP)</div>
-            <div>W/L: {{ r.wins }}/{{ r.losses }}</div>
+        <h3>Recent Champions</h3>
+        <div class="recent-champs-grid">
+          @for (c of championSummary; track c.championId) {
+          <div class="recent-champ-card">
+            <div class="recent-champ-header">
+              @if (masteryChampIconUrl(c.championId); as ic) {
+                <img [src]="ic" class="recent-champ-icon" [alt]="c.championName" />
+              }
+              <div class="recent-champ-name">{{ c.championName }}</div>
+            </div>
+            <div class="recent-champ-stats">
+              <div class="stat-row">
+                <span class="stat-label">Games:</span>
+                <span class="stat-val">{{ c.count }}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Winrate:</span>
+                <span class="stat-val" [class.high-wr]="(c.wins / c.count) >= 0.5" [class.low-wr]="(c.wins / c.count) < 0.5">
+                  {{ (c.wins / c.count * 100) | number:'1.0-0' }}%
+                </span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">KDA:</span>
+                <span class="stat-val">
+                  {{ ((c.kills + c.assists) / (c.deaths || 1)) | number:'1.2-2' }}
+                </span>
+              </div>
+            </div>
           </div>
           }
         </div>

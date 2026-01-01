@@ -546,3 +546,66 @@
   color: #6b7280;
   margin-left: 4px;
 }
+.recent-champs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.recent-champ-card {
+  background: #333;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-champ-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.recent-champ-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #444;
+}
+
+.recent-champ-name {
+  font-weight: bold;
+  color: #eee;
+}
+
+.recent-champ-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9em;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-label {
+  color: #aaa;
+}
+
+.stat-val {
+  color: #fff;
+  font-weight: 500;
+}
+
+.high-wr {
+  color: #4ade80;
+}
+
+.low-wr {
+  color: #f87171;
+}
+

@@ -41,6 +41,52 @@ export class SummonerComponent {
     if (type === 'ALL') return this.matches();
     return this.matches().filter(m => this.getMatchType(m?.info?.queueId) === type);
   }
+
+  get championSummary() {
+    const b = this.bundle();
+    if (!b?.account?.puuid) return [];
+    const puuid = b.account.puuid;
+    const matches = this.matches();
+
+    const stats: Record<string, {
+      championName: string;
+      championId: number;
+      count: number;
+      wins: number;
+      kills: number;
+      deaths: number;
+      assists: number;
+    }> = {};
+
+    for (const m of matches) {
+      if (!m?.info?.participants) continue;
+      const p = m.info.participants.find((x: any) => x.puuid === puuid);
+      if (!p) continue;
+
+      const cid = p.championId;
+      if (!stats[cid]) {
+        stats[cid] = {
+          championName: p.championName,
+          championId: cid,
+          count: 0,
+          wins: 0,
+          kills: 0,
+          deaths: 0,
+          assists: 0
+        };
+      }
+      stats[cid].count++;
+      if (p.win) stats[cid].wins++;
+      stats[cid].kills += p.kills;
+      stats[cid].deaths += p.deaths;
+      stats[cid].assists += p.assists;
+    }
+
+    return Object.values(stats)
+      .filter(s => s.count > 1)
+      .sort((a, b) => b.count - a.count);
+  }
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private riot = inject(RiotApiService);
@@ -71,7 +117,7 @@ export class SummonerComponent {
   ];
 
   // PAGINARE MATCH-URI
-  pageSize = 5;
+  pageSize = 10;
   currentStart = 0;
   matches = signal<any[]>([]);
   isLoadingMore = signal(false);
