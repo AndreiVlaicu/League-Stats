@@ -7,7 +7,6 @@
 
     <h2>Match Details</h2>
 
-    <div *ngIf="loading()" class="message loading">Loading...</div>
     <div *ngIf="error()" class="message error">{{ error() }}</div>
 
     <div *ngIf="data() as d">
@@ -27,7 +26,7 @@
           <!-- BLUE -->
           <div class="team-card blue">
             <div class="team-header">
-              <span class="team-name">Blue (100)</span>
+              <span class="team-name">Blue</span>
               <span
                 class="team-result"
                 [class.win]="tmap[100]?.win"
@@ -53,7 +52,7 @@
           <!-- RED -->
           <div class="team-card red">
             <div class="team-header">
-              <span class="team-name">Red (200)</span>
+              <span class="team-name">Red</span>
               <span
                 class="team-result"
                 [class.win]="tmap[200]?.win"

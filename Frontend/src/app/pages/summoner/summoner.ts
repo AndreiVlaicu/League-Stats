@@ -342,6 +342,25 @@ export class SummonerComponent {
     return QUEUE_NAMES[queueId] ?? `Queue ${queueId}`;
   }
 
+  platformToRegion(platform?: string): string {
+    if (!platform) return '';
+    const p = platform.toLowerCase();
+    const map: Record<string, string> = {
+      'euw1': 'EUW',
+      'eun1': 'EUNE',
+      'na1': 'NA',
+      'kr': 'KR',
+      'br1': 'BR',
+      'jp1': 'JP',
+      'oc1': 'OCE',
+      'tr1': 'TR',
+      'ru': 'RU',
+      'la1': 'LAN',
+      'la2': 'LAS',
+    };
+    return map[p] ?? platform.toUpperCase();
+  }
+
   playerInMatch(match: any, puuid: string) {
     return match?.info?.participants?.find((p: any) => p?.puuid === puuid) ?? null;
   }

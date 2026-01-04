@@ -10,7 +10,6 @@ import { RegionUI, REGION_TO_ROUTING } from '../../core/regions';
   imports: [CommonModule],
   template: `
     <div style="padding:16px">
-      <h2>Opening profile...</h2>
       @if (error()) {
       <p style="color:#b00">{{ error() }}</p>
       }

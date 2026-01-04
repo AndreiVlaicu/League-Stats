@@ -76,7 +76,7 @@
             </button>
 
             <div class="profile-info">
-              <span><b>Platform:</b> {{ b.platform }}</span>
+              <span><b>Platform:</b> {{ platformToRegion(b.platform) }}</span>
               <span><b>Level:</b> {{ b.summoner.summonerLevel }}</span>
               @if (b.rank && b.rank.length > 0) { @for (r of b.rank; track r.queueType) {
               <span
