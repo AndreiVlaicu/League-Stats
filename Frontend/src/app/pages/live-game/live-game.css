@@ -176,11 +176,6 @@ h2, h3 {
   color: #4ade80;
 }
 
-.champ-name {
-  color: #9ca3af;
-  font-size: 13px;
-}
-
 .loading, .error {
   padding: 20px;
   text-align: center;

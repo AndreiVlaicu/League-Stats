@@ -273,30 +273,6 @@
   font-size: 18px;
 }
 
-.rank-list {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.rank-card {
-  background: #1f1f1f;
-  border: 1px solid #3f3f3f;
-  border-radius: 6px;
-  padding: 12px;
-  min-width: 200px;
-}
-
-.rank-card div {
-  color: #9ca3af;
-  margin: 4px 0;
-  font-size: 14px;
-}
-
-.rank-card b {
-  color: #e5e5e5;
-}
-
 /* TABS */
 .tabs {
   display: flex;
@@ -357,8 +333,8 @@
 
 .champ-name {
   font-weight: 600;
-  color: #e5e5e5 !important;
-  margin-bottom: 4px !important;
+  color: #e5e5e5;
+  margin-bottom: 4px;
 }
 
 .champ-icon,

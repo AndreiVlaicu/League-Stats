@@ -420,22 +420,6 @@ h4 {
   border: 1px solid #ef4444;
 }
 
-.btn-sm {
-  padding: 8px 16px;          /* mai mic decât .btn */
-  border: none;
-  border-radius: 6px;          /* la fel ca .btn */
-  font-size: 13px;             /* puțin mai mic */
-  font-weight: 500;
-  cursor: pointer;
-  background: #3f3f3f;         /* la fel ca .btn */
-  color: #e5e5e5;              /* la fel ca .btn */
-}
-
-.btn-sm:hover {
-  background: #525252;         /* la fel ca .btn:hover */
-}
-
-
 @media (max-width: 768px) {
   .match-card {
     padding: 16px;

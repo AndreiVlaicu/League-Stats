@@ -78,6 +78,12 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn:hover {
+  background: #525252;
 }
 
 .btn-primary {
@@ -87,15 +93,6 @@
 
 .btn-primary:hover {
   background: #16a34a;
-}
-
-.btn-secondary {
-  background: #3f3f3f;
-  color: #e5e5e5;
-}
-
-.btn-secondary:hover {
-  background: #525252;
 }
 
 .message {
