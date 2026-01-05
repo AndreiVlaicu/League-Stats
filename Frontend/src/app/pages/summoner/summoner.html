@@ -65,14 +65,8 @@
           }
           <div class="profile-text">
             <h2>{{ b.account.gameName }}#{{ b.account.tagLine }}</h2>
-            <button
-              type="button"
-              class="btn favorite-btn"
-              [class.active]="isFavorite(b)"
-              (click)="toggleFavorite(b)"
-            >
-              <span class="star">{{ isFavorite(b) ? '★' : '☆' }}</span>
-              <span>{{ isFavorite(b) ? 'Favorited' : 'Add to favorites' }}</span>
+            <button class="fav-btn" [class.on]="isFav()" (click)="toggleFavorite()">
+              {{ isFav() ? '★ Favorited' : '☆ Add to favorites' }}
             </button>
 
             <div class="profile-info">

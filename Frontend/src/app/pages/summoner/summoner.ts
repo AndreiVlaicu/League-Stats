@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, of, throwError } from 'rxjs';
@@ -100,7 +100,9 @@ export class SummonerComponent {
 
   private champs = inject(ChampionService);
   private ddragon = inject(ChampionService);
-
+  private routeRegion(): RegionUI {
+    return (this.route.snapshot.paramMap.get('region') as RegionUI) ?? this.region;
+  }
   region: RegionUI = 'EUW';
   gameName = '';
   tagLine = '';
@@ -129,22 +131,36 @@ export class SummonerComponent {
   isLoadingMore = signal(false);
   hasMoreMatches = signal(true);
 
-  toggleFavorite(b: any) {
+  isFav = computed(() => {
+    const b = this.bundle();
+    const acc = b?.account;
+    if (!acc) return false;
+
+    const r = this.routeRegion();
+    return this.favs.isFavorite(r, acc.gameName, acc.tagLine);
+  });
+
+  toggleFavorite() {
+    const b = this.bundle();
     const acc = b?.account;
     if (!acc) return;
-    this.favs.toggle(
-      this.region,
-      acc.gameName,
-      acc.tagLine,
-      `${acc.gameName}#${acc.tagLine} (${this.region})`
-    );
+
+    const r = this.routeRegion();
+
+    // (label fără dublarea regiunii)
+    const label = `${acc.gameName}#${acc.tagLine}`;
+
+    this.favs.toggle(r, acc.gameName, acc.tagLine, label);
+
+    // extra-safe: forțează un refresh mic al template-ului dacă ai zoneless/weird CD
+    this.bundle.update((x) => (x ? { ...x } : x));
   }
 
-  isFavorite(b: any): boolean {
+  /*isFavorite(b: any): boolean {
     const acc = b?.account;
     if (!acc) return false;
     return this.favs.isFavorite(this.region, acc.gameName, acc.tagLine);
-  }
+  }*/
 
   uniqueGameNames(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.gameName))).sort();
@@ -346,17 +362,17 @@ export class SummonerComponent {
     if (!platform) return '';
     const p = platform.toLowerCase();
     const map: Record<string, string> = {
-      'euw1': 'EUW',
-      'eun1': 'EUNE',
-      'na1': 'NA',
-      'kr': 'KR',
-      'br1': 'BR',
-      'jp1': 'JP',
-      'oc1': 'OCE',
-      'tr1': 'TR',
-      'ru': 'RU',
-      'la1': 'LAN',
-      'la2': 'LAS',
+      euw1: 'EUW',
+      eun1: 'EUNE',
+      na1: 'NA',
+      kr: 'KR',
+      br1: 'BR',
+      jp1: 'JP',
+      oc1: 'OCE',
+      tr1: 'TR',
+      ru: 'RU',
+      la1: 'LAN',
+      la2: 'LAS',
     };
     return map[p] ?? platform.toUpperCase();
   }
