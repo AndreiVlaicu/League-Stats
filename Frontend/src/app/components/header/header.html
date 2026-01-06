@@ -1,0 +1,52 @@
+<header class="app-header">
+  <div class="header-container">
+    <div class="logo" (click)="goHome()">
+      <div class="logo-text">
+        <span class="logo-league">League</span>
+        <span class="logo-stats">Stats</span>
+      </div>
+      <p class="logo-tagline">Made by some students</p>
+    </div>
+
+    <div class="search-section">
+      <div class="search-inputs">
+        <select [(ngModel)]="region" class="input region-select">
+          <option>EUW</option>
+          <option>EUNE</option>
+          <option>NA</option>
+          <option>KR</option>
+          <option>BR</option>
+          <option>JP</option>
+          <option>OCE</option>
+          <option>TR</option>
+          <option>RU</option>
+          <option>LAN</option>
+          <option>LAS</option>
+        </select>
+
+        <input
+          [(ngModel)]="playerInput"
+          list="playerList"
+          placeholder="gameName#tagLine (e.g., Caps#G2)"
+          class="input search-input"
+          (ngModelChange)="applyPlayerInput($event)"
+          (keyup.enter)="openSummoner()"
+        />
+
+        <datalist id="playerList">
+          @for (p of presets; track p.label) {
+          <option [value]="p.gameName + '#' + p.tagLine">{{ p.label }}</option>
+          }
+        </datalist>
+
+        <button (click)="openSummoner()" class="btn btn-primary">Search</button>
+      </div>
+
+      <div class="header-actions">
+        <button (click)="goFavorites()" class="btn btn-secondary btn-sm">
+         Favorites
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

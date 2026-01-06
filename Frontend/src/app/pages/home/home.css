@@ -254,6 +254,15 @@
   border-radius: 8px;
 }
 
+.btn-secondary {
+  background: #3f3f3f;
+  color: #e5e5e5;
+}
+
+.btn-secondary:hover {
+  background: #525252;
+}
+
 @media (max-width: 640px) {
   .favorite-card {
     flex-direction: column;
