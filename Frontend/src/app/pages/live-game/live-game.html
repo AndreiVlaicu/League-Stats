@@ -10,168 +10,139 @@
     <h2>Live Game Details</h2>
 
     @if (loading()) {
-      <div class="loading">Loading live game data...</div>
+    <div class="loading">Loading live game data...</div>
     } @if (error()) {
-      <div class="error">{{ error() }}</div>
+    <div class="error">{{ error() }}</div>
     } @if (!loading() && !error() && !game()) {
-      <div class="message">
-        Player is not currently in an active game.
-      </div>
-    }
+    <div class="message">Player is not currently in an active game.</div>
+    } @if (game(); as g) {
+    <div class="game-info">
+      <span><b>Mode:</b> {{ g.gameMode }}</span>
+      <span><b>Type:</b> {{ g.gameType }}</span>
+      <span><b>Queue:</b> {{ queueName(g.gameQueueConfigId) }}</span>
+      <span><b>Map:</b> {{ g.mapId }}</span>
+      <span><b>Start Time:</b> {{ g.gameStartTime | date : 'medium' }}</span>
+    </div>
 
-    @if (game(); as g) {
-      <div class="game-info">
-        <span><b>Mode:</b> {{ g.gameMode }}</span>
-        <span><b>Type:</b> {{ g.gameType }}</span>
-        <span><b>Queue:</b> {{ queueName(g.gameQueueConfigId) }}</span>
-        <span><b>Map:</b> {{ g.mapId }}</span>
-        <span><b>Start Time:</b> {{ g.gameStartTime | date:'medium' }}</span>
+    @if (g.bannedChampions?.length) {
+    <div class="bans-container">
+      <h4>Bans</h4>
+      <div class="bans-list">
+        @for (ban of g.bannedChampions; track ban.championId) { @if (champIconUrl(ban.championId);
+        as icon) {
+        <img [src]="icon" class="ban-icon" [title]="champName(ban.championId)" />
+        } }
       </div>
-
-      @if (g.bannedChampions?.length) {
-        <div class="bans-container">
-          <h4>Bans</h4>
-          <div class="bans-list">
-            @for (ban of g.bannedChampions; track ban.championId) {
-              @if (champIconUrl(ban.championId); as icon) {
-                <img [src]="icon" class="ban-icon" [title]="champName(ban.championId)">
-              }
+    </div>
+    } @if (isArenaMode()) {
+    <div class="all-players">
+      <h3>All Participants ({{ allParticipants().length }})</h3>
+      <div class="participants-grid">
+        @for (p of allParticipants(); track p.puuid) {
+        <div class="participant-card">
+          <div class="spells-col">
+            @if (spellIconUrl(p.spell1Id); as s1) {
+            <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)" />
+            } @if (spellIconUrl(p.spell2Id); as s2) {
+            <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)" />
             }
           </div>
+
+          @if (champIconUrl(p.championId); as cicon) {
+          <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)" />
+          }
+
+          <div class="player-info">
+            <div class="player-name" (click)="openByPuuid(p.puuid)">
+              {{ p.riotId || p.summonerName }}
+            </div>
+
+            <button type="button" class="profile-btn" (click)="openByPuuid(p.puuid)">
+              View Profile
+            </button>
+
+            <div class="champ-name">
+              {{ champName(p.championId) }}
+            </div>
+          </div>
         </div>
-      }
+        }
+      </div>
+    </div>
+    } @else {
+    <div class="teams-grid">
+      <div class="team-card blue">
+        <div class="team-header">
+          <span>Blue Team</span>
+        </div>
 
-      @if (isArenaMode()) {
-        <!-- All Participants for Arena/Special modes -->
-        <div class="all-players">
-          <h3>All Participants ({{ allParticipants().length }})</h3>
-          <div class="participants-grid">
-            @for (p of allParticipants(); track p.puuid) {
-              <div class="participant-card">
-                <div class="spells-col">
-                  @if (spellIconUrl(p.spell1Id); as s1) {
-                    <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)">
-                  }
-                  @if (spellIconUrl(p.spell2Id); as s2) {
-                    <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
-                  }
-                </div>
-
-                @if (champIconUrl(p.championId); as cicon) {
-                  <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
-                }
-
-                <div class="player-info">
-                  <div class="player-name" (click)="openByPuuid(p.puuid)">
-                    {{ p.riotId || p.summonerName }}
-                  </div>
-
-                  <!-- ✅ NEW: Profile button -->
-                  <button
-                    type="button"
-                    class="profile-btn"
-                    (click)="openByPuuid(p.puuid)"
-                  >
-                    View Profile
-                  </button>
-
-                  <div class="champ-name">
-                    {{ champName(p.championId) }}
-                  </div>
-                </div>
-              </div>
+        @for (p of team(100); track p.summonerId) {
+        <div class="participant-row">
+          <div class="spells-col">
+            @if (spellIconUrl(p.spell1Id); as s1) {
+            <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)" />
+            } @if (spellIconUrl(p.spell2Id); as s2) {
+            <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)" />
             }
           </div>
-        </div>
-      } @else {
-        <div class="teams-grid">
-          <!-- Blue Team -->
-          <div class="team-card blue">
-            <div class="team-header">
-              <span>Blue Team</span>
-            </div>
 
-            @for (p of team(100); track p.summonerId) {
-            <div class="participant-row">
-              <div class="spells-col">
-                @if (spellIconUrl(p.spell1Id); as s1) {
-                  <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)">
-                }
-                @if (spellIconUrl(p.spell2Id); as s2) {
-                  <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
-                }
-              </div>
-
-              @if (champIconUrl(p.championId); as cicon) {
-                <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
-              }
-
-              <div class="player-info">
-                <div class="player-name" (click)="openByPuuid(p.puuid)">
-                  {{ p.riotId || p.summonerName }}
-                </div>
-
-                <!-- ✅ NEW: Profile button -->
-                <button
-                  type="button"
-                  class="profile-btn"
-                  (click)="openByPuuid(p.puuid)"
-                >
-                  View Profile
-                </button>
-
-                <div class="champ-name">
-                  {{ champName(p.championId) }}
-                </div>
-              </div>
-            </div>
+          @if (champIconUrl(p.championId); as cicon) {
+          <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)" />
           }
+
+          <div class="player-info">
+            <div class="player-name" (click)="openByPuuid(p.puuid)">
+              {{ p.riotId || p.summonerName }}
+            </div>
+
+            <button type="button" class="profile-btn" (click)="openByPuuid(p.puuid)">
+              View Profile
+            </button>
+
+            <div class="champ-name">
+              {{ champName(p.championId) }}
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="team-card red">
+        <div class="team-header">
+          <span>Red Team</span>
         </div>
 
-        <!-- Red Team -->
-        <div class="team-card red">
-          <div class="team-header">
-            <span>Red Team</span>
+        @for (p of team(200); track p.summonerId) {
+        <div class="participant-row">
+          <div class="spells-col">
+            @if (spellIconUrl(p.spell1Id); as s1) {
+            <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)" />
+            } @if (spellIconUrl(p.spell2Id); as s2) {
+            <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)" />
+            }
           </div>
 
-          @for (p of team(200); track p.summonerId) {
-            <div class="participant-row">
-              <div class="spells-col">
-                @if (spellIconUrl(p.spell1Id); as s1) {
-                  <img [src]="s1" class="spell-icon" [title]="spellTitle(p.spell1Id)">
-                }
-                @if (spellIconUrl(p.spell2Id); as s2) {
-                  <img [src]="s2" class="spell-icon" [title]="spellTitle(p.spell2Id)">
-                }
-              </div>
-
-              @if (champIconUrl(p.championId); as cicon) {
-                <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)">
-              }
-
-              <div class="player-info">
-                <div class="player-name" (click)="openByPuuid(p.puuid)">
-                  {{ p.riotId || p.summonerName }}
-                </div>
-
-                <!-- ✅ NEW: Profile button -->
-                <button
-                  type="button"
-                  class="profile-btn"
-                  (click)="openByPuuid(p.puuid)"
-                >
-                  View Profile
-                </button>
-
-                <div class="champ-name">
-                  {{ champName(p.championId) }}
-                </div>
-              </div>
-            </div>
+          @if (champIconUrl(p.championId); as cicon) {
+          <img [src]="cicon" class="champ-icon" [title]="champName(p.championId)" />
           }
+
+          <div class="player-info">
+            <div class="player-name" (click)="openByPuuid(p.puuid)">
+              {{ p.riotId || p.summonerName }}
+            </div>
+
+            <button type="button" class="profile-btn" (click)="openByPuuid(p.puuid)">
+              View Profile
+            </button>
+
+            <div class="champ-name">
+              {{ champName(p.championId) }}
+            </div>
+          </div>
         </div>
+        }
       </div>
-      }
-    }
+    </div>
+    } }
   </div>
 </div>

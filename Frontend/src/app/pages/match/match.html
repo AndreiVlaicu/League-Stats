@@ -18,12 +18,10 @@
         >
       </div>
 
-      <!-- Team Summary -->
       <div *ngIf="teams() as tmap" class="section">
         <h3>Team Summary</h3>
 
         <div class="teams-grid">
-          <!-- BLUE -->
           <div class="team-card blue">
             <div class="team-header">
               <span class="team-name">Blue</span>
@@ -49,7 +47,6 @@
             </div>
           </div>
 
-          <!-- RED -->
           <div class="team-card red">
             <div class="team-header">
               <span class="team-name">Red</span>
@@ -77,7 +74,6 @@
         </div>
       </div>
 
-      <!-- Player Highlight -->
       <div *ngIf="player() as p" class="section">
         <h3>Your Performance</h3>
         <div class="player-highlight">
@@ -125,12 +121,10 @@
         </div>
       </div>
 
-      <!-- Participants -->
       <div class="section">
         <h3>Participants</h3>
 
         <div class="participants-grid">
-          <!-- Winners -->
           <div class="participants-column">
             <h4 class="column-title win">Winners</h4>
             <div
@@ -193,7 +187,6 @@
                   <div>Gold: {{ p.goldEarned }}</div>
                   <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
 
-                  <!-- ✅ NEW: Profile button -->
                   <button
                     type="button"
                     class="btn btn-secondary btn-sm"
@@ -206,7 +199,6 @@
             </div>
           </div>
 
-          <!-- Losers -->
           <div class="participants-column">
             <h4 class="column-title loss">Losers</h4>
             <div
@@ -269,7 +261,6 @@
                   <div>Gold: {{ p.goldEarned }}</div>
                   <div>Dmg: {{ p.totalDamageDealtToChampions }}</div>
 
-                  <!-- ✅ NEW: Profile button -->
                   <button
                     type="button"
                     class="btn btn-secondary btn-sm"
@@ -284,7 +275,6 @@
         </div>
       </div>
 
-      <!-- Timeline -->
       <div *ngIf="killFeed().length || objectiveFeed().length" class="section">
         <div class="timeline-header" (click)="toggleTimeline()">
           <h3>Timeline</h3>
@@ -292,7 +282,6 @@
         </div>
 
         <div class="timeline-grid" [class.collapsed]="!timelineExpanded()">
-          <!-- Kill Feed -->
           <div class="timeline-section">
             <h4>Kill Feed</h4>
 
@@ -331,7 +320,6 @@
             </div>
           </div>
 
-          <!-- Objectives -->
           <div class="timeline-section">
             <h4>Objectives</h4>
 

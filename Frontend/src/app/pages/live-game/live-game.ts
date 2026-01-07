@@ -47,7 +47,6 @@ export class LiveGameComponent implements OnChanges {
   spellsByKey = signal<Record<string, SummonerSpellData>>({});
 
   ngOnInit() {
-    // DataDragon preload
     this.champs.getVersion().subscribe({
       next: (v) => this.ddVersion.set(v),
       error: () => this.ddVersion.set(this.champs.getVersionSync()),
@@ -71,7 +70,6 @@ export class LiveGameComponent implements OnChanges {
         this.game.set(this.gameData);
       }
     } else {
-      // params
       this.route.paramMap.subscribe((pm) => {
         const p = pm.get('platform');
         const s = pm.get('summonerId');
@@ -196,7 +194,6 @@ export class LiveGameComponent implements OnChanges {
       .getCurrentGame(platform, summonerId)
       .pipe(
         catchError((err) => {
-          // 404 = not in game (normal)
           if (err?.status === 404) return of(null);
           return throwError(() => err);
         })

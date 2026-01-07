@@ -7,36 +7,19 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 
-// OPTIONAL: dacă vrei .env (trebuie: npm i dotenv)
-// import 'dotenv/config';
-
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-/**
- * ============================
- * Basic health check ✅
- * ============================
- */
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, riotKey: !!process.env['RIOT_API_KEY'] });
 });
 
-/**
- * ============================
- * Riot API Proxy (server-side)
- * ============================
- * Folosești în Angular:
- *   /api/riot/europe/...
- *   /api/riot/euw1/...
- */
 const RIOT_API_KEY = process.env['RIOT_API_KEY'];
 console.log('RIOT_API_KEY set?', !!RIOT_API_KEY, 'len=', RIOT_API_KEY?.length);
 
 const ALLOWED_HOSTS = new Set([
-  // platform routing
   'br1',
   'eun1',
   'euw1',
@@ -53,17 +36,13 @@ const ALLOWED_HOSTS = new Set([
   'tr1',
   'tw2',
   'vn2',
-  // regional routing
+
   'americas',
   'europe',
   'asia',
   'sea',
 ]);
 
-/**
- * ✅ Compat: dacă mai ai cod vechi care apelează /riot/...
- * îl mapăm automat către /api/riot/...
- */
 app.use('/riot', (req, _res, next) => {
   req.url = req.originalUrl.replace(/^\/riot/, '/api/riot');
   next();
@@ -77,7 +56,7 @@ app.use('/api/riot', async (req, res) => {
     }
 
     const parts = req.path.split('/').filter(Boolean);
-    const host = parts.shift(); // europe / euw1 etc
+    const host = parts.shift();
     const path = parts.join('/');
 
     if (!host || !path) {
@@ -100,12 +79,10 @@ app.use('/api/riot', async (req, res) => {
 
     const r = await fetch(url, { headers: { 'X-Riot-Token': RIOT_API_KEY } });
 
-    // forward content-type (important)
     const ct = r.headers.get('content-type') || 'application/json; charset=utf-8';
     res.status(r.status);
     res.setHeader('content-type', ct);
 
-    // forward Riot rate-limit headers (useful for debug)
     const rl1 = r.headers.get('x-app-rate-limit');
     const rl2 = r.headers.get('x-app-rate-limit-count');
     const rl3 = r.headers.get('x-method-rate-limit');
@@ -122,14 +99,6 @@ app.use('/api/riot', async (req, res) => {
   }
 });
 
-/**
- * ======================================
- * DataDragon Proxy (server-side)
- * ======================================
- * În Angular folosești:
- *   /champion-data/api/versions.json
- *   /champion-data/cdn/<ver>/...
- */
 app.use('/champion-data', async (req, res) => {
   try {
     if (req.method !== 'GET') {
@@ -146,9 +115,7 @@ app.use('/champion-data', async (req, res) => {
     res.status(r.status);
     res.setHeader('content-type', ct);
 
-    // ✅ cache ok pentru assets static (imagini/json)
-    // (ddragon e static; browser-ul va cache-ui)
-    res.setHeader('cache-control', 'public, max-age=86400'); // 1 zi
+    res.setHeader('cache-control', 'public, max-age=86400');
 
     const buf = Buffer.from(await r.arrayBuffer());
     res.send(buf);
@@ -157,9 +124,6 @@ app.use('/champion-data', async (req, res) => {
   }
 });
 
-/**
- * Serve static files from /browser
- */
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
@@ -168,9 +132,6 @@ app.use(
   })
 );
 
-/**
- * SSR handler
- */
 app.use((req, res, next) => {
   angularApp
     .handle(req)
@@ -178,17 +139,11 @@ app.use((req, res, next) => {
     .catch(next);
 });
 
-/**
- * ✅ Error handler (ca să vezi clar ce se întâmplă)
- */
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('SERVER ERROR:', err);
   res.status(500).json({ error: err?.message ?? 'Server error' });
 });
 
-/**
- * Start server
- */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, (error) => {

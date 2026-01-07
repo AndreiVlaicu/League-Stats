@@ -66,14 +66,12 @@
         <button (click)="search()" class="btn btn-secondary">Quick Search</button>
       </div>
 
-      <!-- ✅ FAVORITES (nou) -->
       @if (favs.favorites().length) {
       <div class="favorites-section">
         <div class="favorites-header">
           <h3>Favorites</h3>
 
           <div class="favorites-actions">
-            <!-- dacă NU ai ruta /favorites, poți șterge butonul ăsta -->
             <button class="btn btn-secondary btn-sm" (click)="goFavorites()">View all</button>
             <button class="btn btn-secondary btn-sm" (click)="clearFavorites()">Clear</button>
           </div>

@@ -74,20 +74,17 @@ export class MatchComponent {
   itemsById = signal<Record<string, ItemData>>({});
 
   goldSeries = signal<{ minute: number; blueGold: number; redGold: number; diff: number }[]>([]);
-  // ✅ team info & aggregates
   teams = signal<Record<number, any>>({});
   teamAgg = signal<Record<number, { kills: number; gold: number; dmg: number }>>({
     100: { kills: 0, gold: 0, dmg: 0 },
     200: { kills: 0, gold: 0, dmg: 0 },
   });
 
-  // ✅ timeline feed
   killFeed = signal<KillEventVM[]>([]);
   objectiveFeed = signal<ObjectiveEventVM[]>([]);
   timelineExpanded = signal<boolean>(false);
 
   ngOnInit() {
-    // preload DataDragon
     this.champs.getVersion().subscribe({
       next: (v) => this.ddVersion.set(v),
       error: () => this.ddVersion.set(this.champs.getVersionSync()),
@@ -169,20 +166,17 @@ export class MatchComponent {
     const gameName = (participant?.riotIdGameName || '').trim();
     const tagLine = (participant?.riotIdTagLine || '').trim();
 
-    // 1) Cel mai bine: avem Riot ID direct din match-v5
     if (gameName && tagLine) {
       this.router.navigate(['/summoner', region, gameName, tagLine]);
       return;
     }
 
-    // 2) Fallback: avem puuid
     const puuid = participant?.puuid;
     if (puuid) {
       this.router.navigate(['/summoner-puuid', region, puuid]);
       return;
     }
 
-    // 3) Ultim fallback: avem summonerId -> luăm puuid via Summoner-V4
     const summonerId = participant?.summonerId;
     const platform = this.platformFromRegion(region);
 
@@ -202,7 +196,6 @@ export class MatchComponent {
       return;
     }
 
-    // 4) Nimic disponibil
     this.error.set("Couldn't open the profile (missing Riot ID and puuid).");
   }
 
@@ -311,7 +304,6 @@ export class MatchComponent {
 
   private prettyTowerType(towerType?: string): string {
     if (!towerType) return 'TOWER';
-    // ex: TOP_OUTER_TURRET -> TOP OUTER
     return towerType.replaceAll('_TURRET', '').replaceAll('_', ' ');
   }
 
@@ -337,12 +329,10 @@ export class MatchComponent {
       return { kind: 'HERALD', label: 'Rift Herald' };
     }
 
-    // ✅ În timeline apare des ca "HORDE" (de obicei Voidgrubs: 3 event-uri la minutul ~6)
     if (monsterType === 'HORDE') {
       return { kind: 'OTHER', label: 'Voidgrub' };
     }
 
-    // ✅ Unele patch-uri noi pot avea "ATAKHAN" ca neutral objective
     if (monsterType === 'ATAKHAN') {
       return { kind: 'OTHER', label: 'Atakhan' };
     }
@@ -351,7 +341,6 @@ export class MatchComponent {
   }
 
   private buildTimelineFeeds(match: any, timeline: any) {
-    // reset
     this.killFeed.set([]);
     this.objectiveFeed.set([]);
 
@@ -370,7 +359,6 @@ export class MatchComponent {
       for (const ev of frame?.events ?? []) {
         const type = ev?.type;
 
-        // --- kills ---
         if (type === 'CHAMPION_KILL') {
           const killer = pByParticipantId[Number(ev.killerId)] ?? null;
           const victim = pByParticipantId[Number(ev.victimId)] ?? null;
@@ -387,37 +375,6 @@ export class MatchComponent {
           continue;
         }
 
-        // --- objectives: dragons/baron/herald ---
-        /* if (type === 'ELITE_MONSTER_KILL') {
-          const killer = pByParticipantId[Number(ev.killerId)] ?? null;
-          const monsterType = ev?.monsterType ?? '';
-          const monsterSubType = ev?.monsterSubType ?? '';
-
-          let kind: ObjectiveEventVM['kind'] = 'OTHER';
-          let label = monsterType;
-
-          if (monsterType === 'DRAGON') {
-            kind = 'DRAGON';
-            label = monsterSubType ? `Dragon (${monsterSubType})` : 'Dragon';
-          } else if (monsterType === 'BARON_NASHOR') {
-            kind = 'BARON';
-            label = 'Baron Nashor';
-          } else if (monsterType === 'RIFTHERALD') {
-            kind = 'HERALD';
-            label = 'Rift Herald';
-          }
-
-          const teamId = (killer?.teamId as TeamId) ?? null;
-
-          objs.push({
-            minute: this.toMinute(ev.timestamp),
-            kind,
-            text: `${label} — ${teamId ? this.teamName(teamId) : 'Unknown team'}`,
-            killer,
-            teamId,
-          });
-          continue;
-        }*/
         if (type === 'ELITE_MONSTER_KILL') {
           const killer = pByParticipantId[Number(ev.killerId)] ?? null;
 
@@ -434,40 +391,6 @@ export class MatchComponent {
           });
           continue;
         }
-
-        // --- objectives: towers/inhibs ---
-        /*if (type === 'BUILDING_KILL') {
-          const killer = pByParticipantId[Number(ev.killerId)] ?? null;
-          const buildingType = ev?.buildingType ?? '';
-          const laneType = ev?.laneType ?? '';
-          const towerType = ev?.towerType ?? '';
-          const destroyedTeam = ev?.teamId as TeamId | undefined; // de obicei echipa clădirii distruse
-
-          const lane = this.laneShort(laneType);
-
-          if (buildingType === 'TOWER_BUILDING') {
-            objs.push({
-              minute: this.toMinute(ev.timestamp),
-              kind: 'TOWER',
-              text: `Tower (${lane} ${towerType || ''}) destroyed — ${
-                destroyedTeam ? this.teamName(destroyedTeam) : 'Unknown'
-              }`,
-              killer,
-              teamId: destroyedTeam ?? null,
-            });
-          } else if (buildingType === 'INHIBITOR_BUILDING') {
-            objs.push({
-              minute: this.toMinute(ev.timestamp),
-              kind: 'INHIB',
-              text: `Inhibitor (${lane}) destroyed — ${
-                destroyedTeam ? this.teamName(destroyedTeam) : 'Unknown'
-              }`,
-              killer,
-              teamId: destroyedTeam ?? null,
-            });
-          }
-          continue;
-        }*/
 
         if (type === 'BUILDING_KILL') {
           const killer = pByParticipantId[Number(ev.killerId)] ?? null;
@@ -502,16 +425,13 @@ export class MatchComponent {
       }
     }
 
-    // sort by time
     kills.sort((a, b) => a.minute - b.minute);
     objs.sort((a, b) => a.minute - b.minute);
 
-    // (optional) limit ca să nu fie gigant
     this.killFeed.set(kills.slice(-40));
     this.objectiveFeed.set(objs.slice(-40));
   }
 
-  // ✅ LOAD: match + timeline (păstrăm tot ce aveai + adăugăm timeline)
   private buildGoldSeries(match: any, timeline: any) {
     this.goldSeries.set([]);
     if (!match || !timeline?.info?.frames?.length) return;
@@ -543,7 +463,6 @@ export class MatchComponent {
       points.push({ minute, blueGold: blue, redGold: red, diff: blue - red });
     }
 
-    // uneori sunt minute duplicate (frame-uri), le “compactăm” (păstrăm ultima valoare pe minut)
     const compact = new Map<number, any>();
     for (const p of points) compact.set(p.minute, p);
     this.goldSeries.set(Array.from(compact.values()).sort((a, b) => a.minute - b.minute));
@@ -573,22 +492,18 @@ export class MatchComponent {
       timeline: this.riot.matchTimelineById(routing, matchId).pipe(catchError(() => of(null))),
     }).subscribe({
       next: ({ match, timeline }) => {
-        // ✅ păstrăm structura data() + adăugăm timeline
         const res = { match, timeline };
         this.data.set(res);
 
-        // player highlight
         const p = match?.info?.participants,
           any: any[] = match?.info?.participants ?? [];
         const me = p.find((x: any) => x?.puuid === puuid) ?? null;
         this.player.set(me);
 
-        // teams map
         const tmap: Record<number, any> = {};
         for (const t of match?.info?.teams ?? []) tmap[t.teamId] = t;
         this.teams.set(tmap);
 
-        // team aggregates (kills/gold/dmg)
         const agg: any = {
           100: { kills: 0, gold: 0, dmg: 0 },
           200: { kills: 0, gold: 0, dmg: 0 },
@@ -603,7 +518,6 @@ export class MatchComponent {
         }
         this.teamAgg.set(agg);
 
-        // ✅ timeline feeds
         this.buildTimelineFeeds(match, timeline);
         this.buildGoldSeries(match, timeline);
 

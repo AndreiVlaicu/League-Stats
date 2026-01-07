@@ -28,10 +28,8 @@ export class HomeComponent {
   error = signal<string | null>(null);
   loading = signal(false);
 
-  // ✅ Combo input
   playerInput = '';
 
-  // ✅ Presets (poți pune ce conturi vrei)
   presets: Array<{ region: RegionUI; gameName: string; tagLine: string; label: string }> = [
     { region: 'EUW', gameName: 'Caps', tagLine: 'G2', label: 'Caps#G2 (EUW)' },
     { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
@@ -46,7 +44,6 @@ export class HomeComponent {
   }
   favs = inject(FavoritesService);
 
-  // (opțional) deschide pagina cu toate favoritele
   goFavorites() {
     this.router.navigate(['/favorites']);
   }
@@ -92,7 +89,6 @@ export class HomeComponent {
     }
   }
 
-  // ✅ suport extra: dacă user scrie Caps#G2 oriunde
   private normalizeInputs() {
     if ((!this.gameName || !this.tagLine) && (this.playerInput || '').includes('#')) {
       this.applyPlayerInput(this.playerInput);
@@ -104,7 +100,6 @@ export class HomeComponent {
     }
   }
 
-  // ✅ FIX: fallback EUW <-> EUNE pentru summonerByPuuid (rezolvă 404)
   private summonerByPuuidWithFallback(region: RegionUI, puuid: string) {
     const first = REGION_TO_PLATFORM[region];
     const fallback = region === 'EUW' ? 'eun1' : region === 'EUNE' ? 'euw1' : null;

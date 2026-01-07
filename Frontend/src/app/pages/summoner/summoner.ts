@@ -25,7 +25,6 @@ import { LiveGameComponent } from '../live-game/live-game';
   styleUrls: ['./summoner.css'],
 })
 export class SummonerComponent {
-  // FILTRARE TIP MECI
   matchType = signal<'ALL' | 'RANKED' | 'NORMAL' | 'ARAM' | 'URF' | 'OTHER'>('ALL');
 
   getMatchType(queueId?: number): 'RANKED' | 'NORMAL' | 'ARAM' | 'URF' | 'OTHER' {
@@ -124,7 +123,6 @@ export class SummonerComponent {
     { region: 'EUNE', gameName: 'alfa', tagLine: 'UE4', label: 'alfa#UE4 (EUNE)' },
   ];
 
-  // PAGINARE MATCH-URI
   pageSize = 10;
   currentStart = 0;
   matches = signal<any[]>([]);
@@ -147,20 +145,12 @@ export class SummonerComponent {
 
     const r = this.routeRegion();
 
-    // (label fără dublarea regiunii)
     const label = `${acc.gameName}#${acc.tagLine}`;
 
     this.favs.toggle(r, acc.gameName, acc.tagLine, label);
 
-    // extra-safe: forțează un refresh mic al template-ului dacă ai zoneless/weird CD
     this.bundle.update((x) => (x ? { ...x } : x));
   }
-
-  /*isFavorite(b: any): boolean {
-    const acc = b?.account;
-    if (!acc) return false;
-    return this.favs.isFavorite(this.region, acc.gameName, acc.tagLine);
-  }*/
 
   uniqueGameNames(): string[] {
     return Array.from(new Set(this.presets.map((p) => p.gameName))).sort();
@@ -509,12 +499,10 @@ export class SummonerComponent {
           this.bundle.set(res);
           this.topMasteries.set(res.topMasteries || []);
 
-          // RESET PAGINARE
           this.matches.set([]);
           this.currentStart = 0;
           this.hasMoreMatches.set(true);
 
-          // ÎNCARCĂ PRIMELE 5
           this.loadMoreMatches();
 
           this.loading.set(false);

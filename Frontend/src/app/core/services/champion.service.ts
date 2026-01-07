@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
 export interface ChampionData {
-  id: string; // "Aatrox"
-  key: string; // "266" (numeric string)
+  id: string;
+  key: string;
   name: string;
   title: string;
   image: {
-    full: string; // "Aatrox.png"
+    full: string;
     sprite: string;
     group: string;
     x: number;
@@ -22,7 +22,7 @@ export interface ItemData {
   name: string;
   description: string;
   image: {
-    full: string; // "1001.png"
+    full: string;
     sprite: string;
     group: string;
     x: number;
@@ -30,17 +30,16 @@ export interface ItemData {
     w: number;
     h: number;
   };
-  // item.json e un map cu chei "1001", deci id-ul îl ținem separat când mapăm
   id?: string;
 }
 
 export interface SummonerSpellData {
-  id: string; // "SummonerFlash"
-  key: string; // "4" (numeric string)  <-- important pt lookup din match
+  id: string;
+  key: string;
   name: string;
   description: string;
   image: {
-    full: string; // "SummonerFlash.png"
+    full: string;
     sprite: string;
     group: string;
     x: number;
@@ -50,7 +49,6 @@ export interface SummonerSpellData {
   };
 }
 
-// --- DataDragon response shapes ---
 type DDragonChampionsResponse = {
   data: Record<string, ChampionData>;
   version?: string;
@@ -70,19 +68,8 @@ type DDragonSummonerSpellsResponse = {
 export class ChampionService {
   private http = inject(HttpClient);
 
-  /**
-   * IMPORTANT:
-   * - Dacă ai proxy către https://ddragon.leagueoflegends.com, atunci BASE rămâne "/champion-data"
-   * - BASE trebuie să fie "ddragon root"
-   *
-   * Exemple endpoint-uri prin BASE:
-   *   /champion-data/api/versions.json
-   *   /champion-data/cdn/<ver>/data/en_US/champion.json
-   *   /champion-data/cdn/<ver>/img/champion/Aatrox.png
-   */
   private readonly BASE = '/champion-data';
 
-  // fallback dacă versions.json e blocat/offline
   private readonly FALLBACK_VERSION = '14.1.1';
 
   private versionValue: string = this.FALLBACK_VERSION;
@@ -92,7 +79,6 @@ export class ChampionService {
   private itemsResp$?: Observable<DDragonItemsResponse>;
   private spellsResp$?: Observable<DDragonSummonerSpellsResponse>;
 
-  // --- VERSION ---
   getVersion(): Observable<string> {
     if (!this.version$) {
       this.version$ = this.http.get<string[]>(`${this.BASE}/api/versions.json`).pipe(
@@ -108,12 +94,10 @@ export class ChampionService {
     return this.version$;
   }
 
-  /** dacă vrei sync (pt helpers) */
   getVersionSync(): string {
     return this.versionValue;
   }
 
-  // --- CHAMPIONS ---
   private getChampionsResp(): Observable<DDragonChampionsResponse> {
     if (!this.championsResp$) {
       this.championsResp$ = this.getVersion().pipe(
@@ -132,12 +116,10 @@ export class ChampionService {
     return this.championsResp$;
   }
 
-  /** array de championi */
   getChampions(): Observable<ChampionData[]> {
     return this.getChampionsResp().pipe(map((resp) => Object.values(resp.data ?? {})));
   }
 
-  /** map: numeric key ("84") -> ChampionData (pentru match participant.championId) */
   getChampionsByKey(): Observable<Record<string, ChampionData>> {
     return this.getChampionsResp().pipe(
       map((resp) => {
@@ -149,7 +131,6 @@ export class ChampionService {
     );
   }
 
-  /** map: id ("Aatrox") -> ChampionData */
   getChampionsById(): Observable<Record<string, ChampionData>> {
     return this.getChampionsResp().pipe(
       map((resp) => resp.data ?? {}),
@@ -157,12 +138,10 @@ export class ChampionService {
     );
   }
 
-  /** champion după numeric key ("84") */
   getChampionByKey(key: string): Observable<ChampionData | undefined> {
     return this.getChampionsByKey().pipe(map((m) => m[key]));
   }
 
-  // --- ITEMS ---
   private getItemsResp(): Observable<DDragonItemsResponse> {
     if (!this.itemsResp$) {
       this.itemsResp$ = this.getVersion().pipe(
@@ -179,14 +158,12 @@ export class ChampionService {
     return this.itemsResp$;
   }
 
-  /** items ca array (cu id setat) */
   getItems(): Observable<ItemData[]> {
     return this.getItemsResp().pipe(
       map((resp) => Object.entries(resp.data ?? {}).map(([id, it]) => ({ ...it, id })))
     );
   }
 
-  /** map: itemId ("1001") -> ItemData (cu id inclus) */
   getItemsById(): Observable<Record<string, ItemData>> {
     return this.getItemsResp().pipe(
       map((resp) => {
@@ -198,7 +175,6 @@ export class ChampionService {
     );
   }
 
-  // --- SUMMONER SPELLS ---
   private getSummonerSpellsResp(): Observable<DDragonSummonerSpellsResponse> {
     if (!this.spellsResp$) {
       this.spellsResp$ = this.getVersion().pipe(
@@ -217,12 +193,10 @@ export class ChampionService {
     return this.spellsResp$;
   }
 
-  /** spells ca array */
   getSummonerSpells(): Observable<SummonerSpellData[]> {
     return this.getSummonerSpellsResp().pipe(map((resp) => Object.values(resp.data ?? {})));
   }
 
-  /** map: spell numeric key ("4") -> SummonerSpellData (pt match summoner1Id/summoner2Id) */
   getSummonerSpellsByKey(): Observable<Record<string, SummonerSpellData>> {
     return this.getSummonerSpellsResp().pipe(
       map((resp) => {
@@ -234,17 +208,11 @@ export class ChampionService {
     );
   }
 
-  // =========================
-  // Image URL helpers (safe)
-  // =========================
-
-  /** Champion square icon (Aatrox.png). championId aici = string "Aatrox" */
   getChampionImageUrl(championId: string, version?: string): string {
     const v = version ?? this.versionValue;
     return `${this.BASE}/cdn/${v}/img/champion/${championId}.png`;
   }
 
-  /** Item icon (1001.png). itemId aici = "1001" */
   getItemImageUrl(itemId: string | number, version?: string): string {
     const v = version ?? this.versionValue;
     const id = String(itemId);
@@ -252,16 +220,11 @@ export class ChampionService {
     return `${this.BASE}/cdn/${v}/img/item/${id}.png`;
   }
 
-  /** Spell icon (SummonerFlash.png). spellId aici = "SummonerFlash" */
   getSummonerSpellImageUrl(spellId: string, version?: string): string {
     const v = version ?? this.versionValue;
     return `${this.BASE}/cdn/${v}/img/spell/${spellId}.png`;
   }
 
-  /**
-   * (Pentru match) championKey numeric (ex: 84) -> url icon
-   * Ai nevoie de champion map (byKey) ca să transformi numeric -> "Akali.png"
-   */
   championSquareUrlByNumericKeySync(
     championKey: number | string,
     championsByKey: Record<string, ChampionData>,
@@ -273,7 +236,6 @@ export class ChampionService {
     return `${this.BASE}/cdn/${v}/img/champion/${champ.image.full}`;
   }
 
-  /** (Pentru match) spellKey numeric (ex: 4) -> url icon */
   spellIconUrlByNumericKeySync(
     spellKey: number | string,
     spellsByKey: Record<string, SummonerSpellData>,
@@ -285,7 +247,6 @@ export class ChampionService {
     return `${this.BASE}/cdn/${v}/img/spell/${sp.image.full}`;
   }
 
-  /** spell name by numeric key */
   spellNameByNumericKeySync(
     spellKey: number | string,
     spellsByKey: Record<string, SummonerSpellData>
@@ -293,7 +254,6 @@ export class ChampionService {
     return spellsByKey[String(spellKey)]?.name ?? '';
   }
 
-  /** champion name by numeric key */
   championNameByNumericKeySync(
     championKey: number | string,
     championsByKey: Record<string, ChampionData>
@@ -301,9 +261,7 @@ export class ChampionService {
     return championsByKey[String(championKey)]?.name ?? '';
   }
 
-  /** păstrăm și astea (dar corecte) */
   getChampionSquareImageUrl(championId: string, version?: string): string {
-    // în DataDragon, square e tot champion/<Aatrox>.png
     return this.getChampionImageUrl(championId, version);
   }
 

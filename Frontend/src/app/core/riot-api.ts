@@ -36,10 +36,8 @@ export interface AccountData {
 export class RiotApiService {
   private http = inject(HttpClient);
 
-  // ✅ proxy-ul din src/server.ts
   private readonly BASE = '/api/riot';
 
-  // ---------- Account-V1 (regional routing: europe/americas/asia/sea) ----------
   accountByRiotId(routing: string, gameName: string, tagLine: string): Observable<AccountData> {
     return this.http.get<AccountData>(
       `${this.BASE}/${routing}/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(
@@ -54,7 +52,6 @@ export class RiotApiService {
     );
   }
 
-  // ---------- Summoner-V4 (platform routing: euw1/eun1/na1 etc) ----------
   summonerByPuuid(platform: string, puuid: string): Observable<SummonerData> {
     return this.http.get<SummonerData>(
       `${this.BASE}/${platform}/lol/summoner/v4/summoners/by-puuid/${encodeURIComponent(puuid)}`
@@ -67,7 +64,6 @@ export class RiotApiService {
     );
   }
 
-  // ---------- League-V4 (platform) ----------
   getRankBySummonerId(platform: string, summonerId: string): Observable<RankData[]> {
     return this.http.get<RankData[]>(
       `${this.BASE}/${platform}/lol/league/v4/entries/by-summoner/${encodeURIComponent(summonerId)}`
@@ -88,7 +84,6 @@ export class RiotApiService {
     );
   }
 
-  // ---------- Match-V5 (regional routing) ----------
   matchIdsByPuuid(routing: string, puuid: string, start = 0, count = 20): Observable<string[]> {
     return this.http.get<string[]>(
       `${this.BASE}/${routing}/lol/match/v5/matches/by-puuid/${encodeURIComponent(
@@ -109,7 +104,6 @@ export class RiotApiService {
     );
   }
 
-  // ---------- Spectator-V5 (platform) ----------
   getCurrentGame(platform: string, summonerId: string): Observable<any> {
     return this.http.get<any>(
       `${this.BASE}/${platform}/lol/spectator/v5/active-games/by-summoner/${encodeURIComponent(
@@ -126,7 +120,6 @@ export class RiotApiService {
     );
   }
 
-  // ---------- Champion Mastery-V4 (platform) ----------
   getChampionMasteries(platform: string, summonerId: string): Observable<any[]> {
     return this.http.get<any[]>(
       `${

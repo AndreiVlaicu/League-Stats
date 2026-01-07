@@ -160,7 +160,6 @@
   }
 }
 
-/* HOME FAVORITES (enhanced) */
 .favorites-section {
   margin-top: 18px;
   padding-top: 16px;
@@ -190,7 +189,7 @@
 }
 
 .favorites-actions .btn {
-  flex: 0 0 auto; /* override .btn { flex: 1 } */
+  flex: 0 0 auto; 
 }
 
 .favorites-list {
@@ -245,7 +244,7 @@
 }
 
 .favorite-buttons .btn {
-  flex: 0 0 auto; /* override .btn { flex: 1 } */
+  flex: 0 0 auto; 
 }
 
 .btn-sm {
