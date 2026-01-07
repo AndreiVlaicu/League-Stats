@@ -38,8 +38,17 @@ export class SummonerComponent {
 
   get filteredMatches() {
     const type = this.matchType();
-    if (type === 'ALL') return this.matches();
-    return this.matches().filter((m) => this.getMatchType(m?.info?.queueId) === type);
+    const allMatches = this.matches();
+
+    // Sort matches by timestamp (most recent first)
+    const sorted = [...allMatches].sort((a, b) => {
+      const timeA = a?.info?.gameEndTimestamp || a?.info?.gameStartTimestamp || 0;
+      const timeB = b?.info?.gameEndTimestamp || b?.info?.gameStartTimestamp || 0;
+      return timeB - timeA; // Descending order
+    });
+
+    if (type === 'ALL') return sorted;
+    return sorted.filter((m) => this.getMatchType(m?.info?.queueId) === type);
   }
 
   get championSummary() {

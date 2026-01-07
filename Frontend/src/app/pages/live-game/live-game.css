@@ -51,7 +51,8 @@
   background: #525252;
 }
 
-h2, h3 {
+h2,
+h3 {
   color: #4ade80;
   margin: 0 0 16px 0;
 }
@@ -122,8 +123,12 @@ h2, h3 {
   font-size: 18px;
 }
 
-.blue .team-header { color: #60a5fa; }
-.red .team-header { color: #f87171; }
+.blue .team-header {
+  color: #60a5fa;
+}
+.red .team-header {
+  color: #f87171;
+}
 
 .participant-row {
   display: flex;
@@ -131,6 +136,7 @@ h2, h3 {
   padding: 12px;
   border-bottom: 1px solid #2a2a2a;
   align-items: center;
+  justify-content: space-between;
 }
 
 .participant-row:last-child {
@@ -160,6 +166,10 @@ h2, h3 {
 .player-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
 }
 
 .player-name {
@@ -176,15 +186,52 @@ h2, h3 {
   color: #4ade80;
 }
 
-.loading, .error {
+.profile-btn {
+  padding: 8px 16px;
+  border: 1px solid #3f3f3f;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #2a2a2a;
+  color: #e5e5e5;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.profile-btn:hover {
+  background: #3f3f3f;
+  border-color: #525252;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.profile-btn:active {
+  transform: translateY(0);
+}
+
+.champ-name {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.loading,
+.error {
   padding: 20px;
   text-align: center;
   border-radius: 8px;
   margin: 20px 0;
 }
 
-.loading { background: #1f2937; color: #4ade80; }
-.error { background: #3f1f1f; color: #fca5a5; }
+.loading {
+  background: #1f2937;
+  color: #4ade80;
+}
+.error {
+  background: #3f1f1f;
+  color: #fca5a5;
+}
 
 @media (max-width: 768px) {
   .teams-grid {
