@@ -40,11 +40,10 @@ export class SummonerComponent {
     const type = this.matchType();
     const allMatches = this.matches();
 
-    // Sort matches by timestamp (most recent first)
     const sorted = [...allMatches].sort((a, b) => {
       const timeA = a?.info?.gameEndTimestamp || a?.info?.gameStartTimestamp || 0;
       const timeB = b?.info?.gameEndTimestamp || b?.info?.gameStartTimestamp || 0;
-      return timeB - timeA; // Descending order
+      return timeB - timeA;
     });
 
     if (type === 'ALL') return sorted;
