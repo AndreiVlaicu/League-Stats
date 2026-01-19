@@ -106,7 +106,6 @@ The app uses a proxy configuration to handle CORS when communicating with Riot's
 
 - [Demo Video (YouTube)](https://www.youtube.com/watch?v=JMWoOkIspnk)
 - [Documentation](https://docs.google.com/document/d/1br0_ukY_cjxBSkStoSz7EkPGnM5yzg2zWopqgh1tpPk/edit?usp=sharing)
-- [Riot Developer Portal](https://developer.riotgames.com/)
 
 ## License
 
